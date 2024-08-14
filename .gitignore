@@ -1,0 +1,29 @@
+# Ignorar la carpeta "node_modules"
+node_modules/
+
+# Ignorar la carpeta "platforms"
+platforms/
+
+# Ignorar la carpeta "plugins"
+plugins/
+
+# Ignorar la carpeta "www"
+www/
+
+# Ignorar archivos de configuración específicos del entorno
+.env
+.env.local
+.env.*.local
+
+# Ignorar archivos de configuración de IDE
+.vscode/
+.idea/
+
+# Ignorar archivos de logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignorar archivos de compilación
+build/
+dist/
