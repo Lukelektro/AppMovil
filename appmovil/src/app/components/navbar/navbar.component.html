@@ -1,19 +1,17 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>
-      la navbar mas chatgpt del mundo
-    </ion-title>
-    <ion-buttons slot="end">
-      <ion-button routerLink="/home">
-        Home
-      </ion-button>
-      <ion-button routerLink="/inventory">
-        Inventory
-      </ion-button>
-      <ion-button routerLink="/login">
-        Login
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ion-tabs>
+  <ion-tab-bar slot="home">
+    <ion-tab-button tab="home">
+      <ion-icon name="home"></ion-icon>
+      Home
+    </ion-tab-button>
+    <ion-tab-button tab="inventory">
+      <ion-icon name="list"></ion-icon>
+      Inventory
+    </ion-tab-button>
+    <ion-tab-button tab="login">
+      <ion-icon name="body"></ion-icon>
+      Login
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
 
