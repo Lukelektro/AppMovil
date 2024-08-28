@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import { InventoryPage } from './inventory.page';
 
 const routes: Routes = [

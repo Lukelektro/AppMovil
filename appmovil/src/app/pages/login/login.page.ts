@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Usuario } from 'src/app/models/usuario.model';
+import { Usuario } from 'src/app/models/ususario.model';
 
 @Component({
   selector: 'app-login',
@@ -8,17 +8,19 @@ import { Usuario } from 'src/app/models/usuario.model';
 })
 export class LoginPage implements OnInit {
 
+  passwordType: string = 'password'
+  passwordIcon: string = 'eye-off'
   usuario: Usuario = new Usuario();
 
-  passwordType: string = 'password';
-  passwordIcon: string = 'eye-off';
+
 
   constructor() { }
 
   ngOnInit() {
   }
 
-  MostrarPassword() {
+  MostrarPassword(): void{
+
     if (this.passwordType === 'password') {
       this.passwordType = 'text';
       this.passwordIcon = 'eye';
