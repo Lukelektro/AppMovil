@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Usuario } from 'src/app/models/ususario.model';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -12,12 +13,14 @@ export class LoginPage implements OnInit {
   usuario: Usuario = new Usuario();
 
 
+
   constructor() { }
 
   ngOnInit() {
   }
 
   MostrarPassword(): void{
+
     if (this.passwordType === 'password') {
       this.passwordType = 'text';
       this.passwordIcon = 'eye';
