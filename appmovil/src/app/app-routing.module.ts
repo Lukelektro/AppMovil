@@ -17,11 +17,14 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'login', //redirige al login al principio
     pathMatch: 'full'
   },
   
 ];
+
+
+
 
 @NgModule({
   imports: [

@@ -1,21 +1,23 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { BottombarComponent } from './bottombar/bottombar.component';
+import { RouterModule } from '@angular/router'; 
 import { ToolbarComponent } from './toolbar/toolbar.component';
+import { TabComponent } from './tab/tab.component';
 
 @NgModule({
   declarations: [
-    BottombarComponent,
-    ToolbarComponent
+    ToolbarComponent,
+    TabComponent
   ],
   imports: [
     CommonModule,
-    IonicModule
+    IonicModule,
+    RouterModule 
   ],
   exports: [
-    BottombarComponent,
-    ToolbarComponent
+    ToolbarComponent,
+    TabComponent
   ]
 })
 export class ComponentsModule {}
