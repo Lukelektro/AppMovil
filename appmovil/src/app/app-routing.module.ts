@@ -19,7 +19,15 @@ const routes: Routes = [
     path: '',
     redirectTo: 'login', //redirige al login al principio
     pathMatch: 'full'
+  },  {
+    path: 'ofertas',
+    loadChildren: () => import('./pages/ofertas/ofertas.module').then( m => m.OfertasPageModule)
   },
+  {
+    path: 'citas',
+    loadChildren: () => import('./pages/citas/citas.module').then( m => m.CitasPageModule)
+  },
+
   
 ];
 
