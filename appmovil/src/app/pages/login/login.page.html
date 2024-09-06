@@ -16,7 +16,7 @@
 
         <ion-card>
           <ion-card-header>
-            <ion-card-title>Ingrea tu usuario</ion-card-title>
+            <ion-card-title>Ingresa tu usuario</ion-card-title>
           </ion-card-header>
         
           <ion-list>
@@ -26,13 +26,23 @@
               </ion-input>
             </ion-item>
             <ion-item>
-              <ion-input [type]="passwordType" [(ngModel)]="usuario.password" labelPlacement="stacked" type="password" label="Password" placeholder="Password">
+              <ion-text color="danger" *ngIf="emailInvalid">Email inválido</ion-text>
+            </ion-item>
+            <ion-item>
+              <ion-input [type]="passwordType" [(ngModel)]="usuario.password" labelPlacement="stacked" type="password" errorText="Invalid email" label="Password" placeholder="Password" email>
                 <ion-icon slot="start" name="lock-closed" aria-hidden="true"></ion-icon>
                 <ion-button fill="clear" slot="end" aria-label="Show/hide" (click)="MostrarPassword()">
                   <ion-icon slot="icon-only" name="eye" aria-hidden="true"></ion-icon>
                 </ion-button>
               </ion-input>
             </ion-item>
+            <ion-item>
+              <ion-text color="danger" *ngIf="passwordInvalid">Contraseña inválida</ion-text>
+            </ion-item>
+            <ion-item>
+              <a href="#">Registrarme</a>
+            </ion-item>
+            
           </ion-list>
 
           <ion-item >

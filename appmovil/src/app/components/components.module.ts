@@ -4,11 +4,14 @@ import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router'; 
 import { ToolbarComponent } from './toolbar/toolbar.component';
 import { TabComponent } from './tab/tab.component';
+import { CardComponent } from './card/card.component';
+
 
 @NgModule({
   declarations: [
     ToolbarComponent,
-    TabComponent
+    TabComponent,
+    CardComponent
   ],
   imports: [
     CommonModule,
@@ -17,7 +20,8 @@ import { TabComponent } from './tab/tab.component';
   ],
   exports: [
     ToolbarComponent,
-    TabComponent
+    TabComponent,
+    CardComponent
   ]
 })
 export class ComponentsModule {}
