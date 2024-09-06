@@ -34,6 +34,9 @@
 
 @import "@ionic/angular/css/palettes/dark.system.css";
 
+@import 'swiper/scss';
+@import 'swiper/scss/pagination';
+@import 'swiper/scss/navigation';
 
 .custom-align-center {
     display: flex;
