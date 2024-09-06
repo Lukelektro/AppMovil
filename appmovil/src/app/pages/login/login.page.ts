@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router'
 import { Usuario } from 'src/app/models/ususario.model';
 
 @Component({
@@ -14,9 +15,13 @@ export class LoginPage implements OnInit {
 
 
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit() {
+  }
+
+  Login() {
+    this.router.navigate(['/home']);
   }
 
   MostrarPassword(): void{

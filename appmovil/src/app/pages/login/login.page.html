@@ -1,8 +1,5 @@
 <ion-header [translucent]="true">
 
-  <ion-toolbar>
-    <ion-title>login</ion-title>
-  </ion-toolbar>
 </ion-header>
 
 <ion-content color="light" [fullscreen]="true">
@@ -39,7 +36,7 @@
           </ion-list>
 
           <ion-item >
-            <ion-button slot="end" size="default" >Ingresar</ion-button>
+            <ion-button slot="end" (click)="Login()" size="default" >Ingresar</ion-button>
           </ion-item>
 
         </ion-card>
