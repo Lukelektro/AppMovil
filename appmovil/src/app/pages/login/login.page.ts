@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router'
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { Usuario } from 'src/app/models/ususario.model';
 
 @Component({
@@ -7,25 +7,18 @@ import { Usuario } from 'src/app/models/ususario.model';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnInit {
-
-  passwordType: string = 'password'
-  passwordIcon: string = 'eye-off'
+export class LoginPage {
+  passwordType: string = 'password';
+  passwordIcon: string = 'eye-off';
   usuario: Usuario = new Usuario();
+  emailInvalid = false;
+  passwordInvalid = false;
 
+  constructor(private router: Router) {}
 
+  ngOnInit() {}
 
-  constructor(private router: Router) { }
-
-  ngOnInit() {
-  }
-
-  Login() {
-    this.router.navigate(['/home']);
-  }
-
-  MostrarPassword(): void{
-
+  MostrarPassword() {
     if (this.passwordType === 'password') {
       this.passwordType = 'text';
       this.passwordIcon = 'eye';
@@ -35,4 +28,25 @@ export class LoginPage implements OnInit {
     }
   }
 
+  Login() {
+    this.emailInvalid = !this.validarEmail(this.usuario.email);
+    this.passwordInvalid = !this.validarPassword(this.usuario.password);
+
+    if (this.emailInvalid || this.passwordInvalid) {
+      return;
+    }
+
+    // Lógica para ingresar
+    this.router.navigate(['/home']);
+  }
+
+  validarEmail(email: string): boolean {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //codigo regex pa validar el email
+    return re.test(String(email).toLowerCase());
+  }
+
+  validarPassword(password: string): boolean {
+    // Ejemplo de validación: al menos 6 caracteres
+    return password.length >= 6;
+  }
 }
