@@ -7,9 +7,22 @@ import { Component, Input,OnInit } from '@angular/core';
 })
 export class ToolbarComponent  implements OnInit {
 
-  @Input() title: string = '';
+  searchActive = false;
+  searchQuery = '';
 
   constructor() { }
+
+  toggleSearch() {
+    this.searchActive = !this.searchActive;
+    if (!this.searchActive) {
+      this.searchQuery = '';
+    }
+  }
+
+  handleSearch(event: any) {
+    // Implementa aquí la lógica de búsqueda
+    console.log('Buscando:', this.searchQuery);
+  }
 
   ngOnInit() {}
 

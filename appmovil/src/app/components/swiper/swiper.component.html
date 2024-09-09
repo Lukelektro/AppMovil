@@ -1,8 +1,8 @@
 <swiper-container
   [slidesPerView]="1"
-  [spaceBetween]="30"
+  [spaceBetween]="0"
   [pagination]="true"
-  [navigation]="true"
+  [navigation]="false"
 >
   <swiper-slide *ngFor="let image of images">
     <img [src]="image.url" [alt]="image.alt">

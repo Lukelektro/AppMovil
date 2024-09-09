@@ -6,6 +6,7 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
 import { TabComponent } from './tab/tab.component';
 import { CardComponent } from './card/card.component';
 import { SwiperComponent } from './swiper/swiper.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { SwiperComponent } from './swiper/swiper.component';
   ],
   imports: [
     CommonModule,
+    FormsModule,
     IonicModule,
     RouterModule,
     SwiperComponent 
