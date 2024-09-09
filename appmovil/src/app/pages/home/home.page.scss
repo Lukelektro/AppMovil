@@ -30,3 +30,55 @@
   width: 600px;
   height: 300px;
 }
+
+.custom-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--ion-color-primary);
+  text-align: center;
+  margin: 22px 0;
+}
+
+.custom-subtitle {
+  font-size: 16px;
+  font-weight: semibold;
+  color: var(--ion-color-secundary);
+  text-align: center;
+  margin: 22px 0;
+}
+
+.custom-card-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff5733;
+  text-align: center;
+  margin: 16px 0;
+}
+
+.cards-container {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+}
+
+ion-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  justify-content: center;
+  align-items: center;
+}
+
+ion-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.centered-icon {
+  font-size: 36px; 
+  text-align: center;
+  color: var(--ion-color-primary);
+  margin: 16px 0; 
+}

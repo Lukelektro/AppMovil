@@ -34,7 +34,7 @@ export class SwiperComponent implements OnInit, AfterViewInit {
       pagination: {
         clickable: true,
       },
-      navigation: true,
+      navigation: false,
     };
     
     Object.assign(swiperEl, swiperParams);

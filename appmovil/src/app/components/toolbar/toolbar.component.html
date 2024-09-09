@@ -1,15 +1,13 @@
-<ion-toolbar color="dark">
+<ion-toolbar color="light">
   <ion-buttons slot="start">
-    <ion-button (click)="toggleSearch()">
-      <ion-icon slot="icon-only" name="search"></ion-icon>
-    </ion-button>
+    <ion-menu-button autoHide="false"></ion-menu-button>
   </ion-buttons>
   <ion-buttons slot="primary" class="toolbar-center">
-    <img src="assets/img/icono2.jpg" class="icono-toolbar" alt="icono">
+    <img src="assets/img/icono.jpg" class="icono-toolbar" alt="icono">
   </ion-buttons>
   <ion-buttons slot="end">
-    <ion-button>
-      <ion-menu-button auto-hide="false"></ion-menu-button>
+    <ion-button (click)="toggleSearch()">
+      <ion-icon slot="icon-only" name="search"></ion-icon>
     </ion-button>
   </ion-buttons>
 </ion-toolbar>
