@@ -7,11 +7,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CitasPage implements OnInit {
 
-  pageTitle: string = 'Citas';
-
   constructor() { }
 
   ngOnInit() {
+  }
+
+  agendarCita() {
+    // Aquí puedes implementar la lógica para agendar la cita
+    console.log('Cita agendada');
   }
 
 }

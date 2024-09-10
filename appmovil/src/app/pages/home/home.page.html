@@ -1,26 +1,21 @@
-
-<ion-content [fullscreen]="true">
-
+<ion-header [translucent]="true">
   <app-toolbar></app-toolbar>
+</ion-header>
 
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Home</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<app-swiper></app-swiper>
 
-  <app-swiper></app-swiper>
+<ion-content [fullscreen]="false"> <!-- Aqui comienza el contenido scrollable, no funcionaba porque NO se debe mezclar con ningun componente ni con el header -->
 
-  <h2 class="custom-title" >Bienvenido a Pet's Fancy</h2>
+  <h2 class="custom-title">Bienvenido a Pet's Fancy</h2>
     
-  <h3 class="custom-subtitle">Principales categorias</h3>
-
+  <h3 class="custom-subtitle">Principales categorías</h3>
 
   <div class="cards-container">
     <ion-card>
       <ion-card-header>
         <ion-icon name="pizza" class="centered-icon"></ion-icon>
         <ion-card-title>Alimentos</ion-card-title>
+        <ion-button>Pedir!</ion-button>
       </ion-card-header>
     </ion-card>
 
@@ -28,10 +23,9 @@
       <ion-card-header>
         <ion-icon name="nuclear" class="centered-icon"></ion-icon>
         <ion-card-title>Arenas Sanitarias</ion-card-title>
+        <ion-button>Pedir!</ion-button>
       </ion-card-header>
     </ion-card>
-
-    
   </div>
 
   <div class="cards-container">
@@ -39,6 +33,7 @@
       <ion-card-header>
         <ion-icon name="medkit" class="centered-icon"></ion-icon>
         <ion-card-title>Salud e Higiene</ion-card-title>
+        <ion-button>Pedir!</ion-button>
       </ion-card-header>
     </ion-card>
 
@@ -46,6 +41,7 @@
       <ion-card-header>
         <ion-icon name="american-football" class="centered-icon"></ion-icon>
         <ion-card-title>Juguetes</ion-card-title>
+        <ion-button>Pedir!</ion-button>
       </ion-card-header>
     </ion-card>
   </div>
@@ -55,8 +51,6 @@
     <ion-button>Pedir!</ion-button>
   </div>
 
-
-  
-  <app-tab></app-tab>
-  
 </ion-content>
+
+<app-tab></app-tab> <!-- Este componente debe estar fuera del ion-content, NUNCA dentro  -->

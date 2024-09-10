@@ -3,10 +3,33 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">citas</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <app-tab></app-tab>
+  <div class="container">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Agendar Cita</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form (ngSubmit)="agendarCita()" #citaForm="ngForm">
+          <ion-item>
+            <ion-label position="floating">Nombre</ion-label>
+            <ion-input type="text" name="nombre" ngModel required></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Fecha</ion-label>
+            <ion-datetime name="fecha" ngModel displayFormat="DD/MM/YYYY" required></ion-datetime>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="floating">Hora</ion-label>
+            <ion-datetime name="hora" ngModel displayFormat="HH:mm" pickerFormat="HH:mm" required></ion-datetime>
+          </ion-item>
+
+          <ion-button expand="full" type="submit" [disabled]="!citaForm.form.valid">Agendar Cita</ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>
+
+<app-tab></app-tab>
