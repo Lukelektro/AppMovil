@@ -1,8 +1,6 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true"></ion-header>
 
-</ion-header>
-
-<ion-content color="light" [fullscreen]="true">
+<ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Login</ion-title>
@@ -21,7 +19,7 @@
         
           <ion-list>
             <ion-item>
-              <ion-input labelPlacement="stacked"[(ngModel)]="usuario.email" type="email" label="Email" placeholder="email@domain.com">
+              <ion-input labelPlacement="stacked"[(ngModel)]="usuario.email" type="email" label="Email" placeholder="email@domain.com" email>
                 <ion-icon slot="start" name="mail" aria-hidden="true"></ion-icon>
               </ion-input>
             </ion-item>
@@ -29,7 +27,7 @@
               <ion-text color="danger" *ngIf="emailInvalid">Email inválido</ion-text>
             </ion-item>
             <ion-item>
-              <ion-input [type]="passwordType" [(ngModel)]="usuario.password" labelPlacement="stacked" type="password" label="Password" placeholder="Password" email>
+              <ion-input [type]="passwordType" [(ngModel)]="usuario.password" labelPlacement="stacked" type="password" label="Password" placeholder="Password" password>
                 <ion-icon slot="start" name="lock-closed" aria-hidden="true"></ion-icon>
                 <ion-button fill="clear" slot="end" aria-label="Show/hide" (click)="MostrarPassword()">
                   <ion-icon slot="icon-only" name="eye" aria-hidden="true"></ion-icon>
@@ -38,17 +36,15 @@
             </ion-item>
             <ion-item>
               <ion-text color="danger" *ngIf="passwordInvalid">Contraseña inválida</ion-text>
-            </ion-item>
-            <ion-item>
-              <a href="#">Registrarme</a>
+              <a slot="end" routerLink="/">Olvide mi Contraseña</a>
             </ion-item>
             
           </ion-list>
 
-          <ion-item >
-            <ion-button slot="end" (click)="Login()" size="default" >Ingresar</ion-button>
-          </ion-item>
-
+          <div class="center-container">
+            <ion-button (click)="Login()" size="default" >Ingresar</ion-button>
+            <ion-button fill="outline" routerLink="/registro" size="default" >Registrarme</ion-button>
+          </div>
         </ion-card>
       </ion-col>
     </ion-row>

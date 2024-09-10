@@ -12,7 +12,7 @@ export class OfertasPage implements OnInit {
 
   constructor(private toastController: ToastController) { }
 
-  ngOnInit() {
+  ngOnInit() {   
   }
 
   async saveChanges() {

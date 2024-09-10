@@ -46,7 +46,7 @@ export class LoginPage {
   }
 
   validarPassword(password: string): boolean {
-    // Ejemplo de validación: al menos 6 caracteres
+    // al menos 6 caracteres
     return password.length >= 6;
   }
 }
