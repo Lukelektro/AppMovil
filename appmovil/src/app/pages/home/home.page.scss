@@ -82,3 +82,9 @@ ion-card-header {
   color: var(--ion-color-primary);
   margin: 16px 0; 
 }
+
+.contenedor-cita {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
