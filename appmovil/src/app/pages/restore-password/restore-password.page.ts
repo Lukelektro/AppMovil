@@ -40,7 +40,7 @@ export class RestorePasswordPage {
   async presentAlert() {
     const alert = await this.alertController.create({
       header: 'Correo Enviado',
-      message: 'Se ha enviado un correo con el enlace para restablecer tu contraseña.',
+      message: 'Se ha enviado un enlace para restablecer tu contraseña al correo '+ this.email + '.',
       buttons: [{
         text: 'OK',
         handler: () => {
