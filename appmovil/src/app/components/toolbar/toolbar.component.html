@@ -13,9 +13,17 @@
     <ion-toggle [(ngModel)]="themeToggle" (ionChange)="toggleChange($event)" justify="space-between">
       Dark Mode
     </ion-toggle>
-    -->
+  -->
+    <ng-container *ngIf="showCartButton">
+      <ion-button (click)="openCartMenu()">
+        <ion-icon name="cart"></ion-icon>
+      </ion-button>
+    </ng-container>
   </ion-buttons>
+  
 </ion-toolbar>
+<!--
 <div class="search-container" [class.active]="searchActive">
   <ion-input placeholder="Buscar..." [(ngModel)]="searchQuery" (ionInput)="handleSearch($event)"></ion-input>
 </div>
+-->

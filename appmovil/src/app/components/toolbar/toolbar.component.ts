@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input  } from '@angular/core';
+import { MenuController } from '@ionic/angular';
 
 @Component({
   selector: 'app-toolbar',
@@ -9,12 +10,18 @@ export class ToolbarComponent implements OnInit {
   searchActive = false;
   searchQuery = '';
   themeToggle = false; // Variable para el toggle del tema oscuro
+  @Input() showCartButton: boolean = false;
 
-  constructor() {
+  constructor(private menuCtrl: MenuController) {
     this.initDarkMode();
   }
 
   ngOnInit() {}
+
+  openCartMenu() {
+    this.menuCtrl.open('cart-menu');
+  }
+  
 
   toggleSearch() {
     this.searchActive = !this.searchActive;

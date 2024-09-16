@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import { Usuario } from 'src/app/models/usuario.model';
 
 @Component({
   selector: 'app-login',
@@ -48,7 +47,7 @@ export class LoginPage {
     await loading.onDidDismiss();
 
     // Lógica para ingresar
-    this.router.navigate(['/home']);
+    this.router.navigate(['/tab/home']);
   }
 
   validarEmail(email: string): boolean {

@@ -4,28 +4,13 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: 'home',
-    loadChildren: () => import('./pages/home/home.module').then( m => m.HomePageModule)
-  },
-  {
-    path: 'inventory',
-    loadChildren: () => import('./pages/inventory/inventory.module').then( m => m.InventoryPageModule)
+    path: '',
+    redirectTo: 'login', //redirige al login al principio
+    pathMatch: 'full'
   },
   {
     path: 'login',
     loadChildren: () => import('./pages/login/login.module').then( m => m.LoginPageModule)
-  },
-  {
-    path: '',
-    redirectTo: 'login', //redirige al login al principio
-    pathMatch: 'full'
-  },  {
-    path: 'ofertas',
-    loadChildren: () => import('./pages/ofertas/ofertas.module').then( m => m.OfertasPageModule)
-  },
-  {
-    path: 'citas',
-    loadChildren: () => import('./pages/citas/citas.module').then( m => m.CitasPageModule)
   },
   {
     path: 'perfil',
@@ -38,6 +23,10 @@ const routes: Routes = [
   {
     path: 'restore-password',
     loadChildren: () => import('./pages/restore-password/restore-password.module').then( m => m.RestorePasswordPageModule)
+  },
+  {
+    path: 'tab',
+    loadChildren: () => import('./pages/tab/tab.module').then( m => m.TabPageModule)
   },
 
   

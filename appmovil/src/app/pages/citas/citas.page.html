@@ -1,35 +1,52 @@
-<ion-header [translucent]="true">
-  <app-toolbar></app-toolbar>
+<ion-header>
+  <app-toolbar [showCartButton]="false"></app-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <div class="container">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Agendar Cita</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <form (ngSubmit)="agendarCita()" #citaForm="ngForm">
-          <ion-item>
-            <ion-label position="floating">Nombre</ion-label>
-            <ion-input type="text" name="nombre" ngModel required></ion-input>
-          </ion-item>
-          
-          <ion-item>
-            <ion-label position="floating">Fecha</ion-label>
-            <ion-datetime name="fecha" ngModel displayFormat="DD/MM/YYYY" required></ion-datetime>
-          </ion-item>
-          
-          <ion-item>
-            <ion-label position="floating">Hora</ion-label>
-            <ion-datetime name="hora" ngModel displayFormat="HH:mm" pickerFormat="HH:mm" required></ion-datetime>
-          </ion-item>
+<ion-content class="ion-padding">
 
-          <ion-button expand="full" type="submit" [disabled]="!citaForm.form.valid">Agendar Cita</ion-button>
-        </form>
-      </ion-card-content>
-    </ion-card>
-  </div>
+  <h1 class="custom-title">Agendar un cita</h1>
+
+    <form (ngSubmit)="submitAppointment()" >
+
+      <ion-item>
+          <ion-datetime
+          [(ngModel)]="fechaCita"
+          name="fechaCita" 
+          presentation="date"
+          [preferWheel]="true">
+          <h3 slot="title">Fecha de la cita</h3>
+        </ion-datetime>
+      </ion-item>
+
+
+      <!-- Selección de la hora de la cita -->
+      <ion-item>
+        <ion-label position="floating">Hora de la Cita</ion-label>
+        <ion-select [(ngModel)]="horaCita" name="horaCita" placeholder="Seleccionar Hora">
+          <ion-select-option *ngFor="let hora of horasDisponibles" [value]="hora">
+            {{ hora }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+  
+      <!-- Selección del servicio -->
+      <ion-item>
+        <ion-label position="floating">Servicio Solicitado</ion-label>
+        <ion-select [(ngModel)]="servicio" name="servicio" placeholder="Seleccionar Servicio">
+          <ion-select-option *ngFor="let servicio of servicios" [value]="servicio">
+            {{ servicio }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+  
+      <!-- Botón de enviar -->
+      <ion-button expand="block" type="submit">Agendar Cita</ion-button>
+    </form>
+
+
+
+  <!-- Confirmación -->
+  <ion-item *ngIf="confirmacion">
+    <ion-label>{{ confirmacion }}</ion-label>
+  </ion-item>
 </ion-content>
-
-<app-tab></app-tab>

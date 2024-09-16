@@ -1,10 +1,10 @@
 <ion-header [translucent]="true">
-  <app-toolbar></app-toolbar>
+  <app-toolbar [showCartButton]="false"></app-toolbar>
 </ion-header>
 
 <app-swiper></app-swiper>
 
-<ion-content [fullscreen]="false"> <!-- Aqui comienza el contenido scrollable, no funcionaba porque NO se debe mezclar con ningun componente ni con el header -->
+<ion-content [fullscreen]="false"> 
 
   <h2 class="custom-title">Bienvenido a Pet's Fancy</h2>
     
@@ -53,4 +53,3 @@
 
 </ion-content>
 
-<app-tab></app-tab> <!-- Este componente debe estar fuera del ion-content, NUNCA dentro  -->
