@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import { Usuario } from 'src/app/models/ususario.model';
 
 @Component({
@@ -14,7 +15,7 @@ export class LoginPage {
   emailInvalid = false;
   passwordInvalid = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private loadingController: LoadingController) {}
 
   ngOnInit() {}
 
@@ -28,13 +29,22 @@ export class LoginPage {
     }
   }
 
-  Login() {
+  async Login() {
     this.emailInvalid = !this.validarEmail(this.usuario.email);
     this.passwordInvalid = !this.validarPassword(this.usuario.password);
 
     if (this.emailInvalid || this.passwordInvalid) {
       return;
     }
+
+    const loading = await this.loadingController.create({
+      duration: 3000
+    });
+
+    await loading.present();
+
+    // Esperar a que el loading se dismissee
+    await loading.onDidDismiss();
 
     // Lógica para ingresar
     this.router.navigate(['/home']);

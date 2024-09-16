@@ -36,13 +36,13 @@
             </ion-item>
             <ion-item>
               <ion-text color="danger" *ngIf="passwordInvalid">Contraseña inválida</ion-text>
-              <a slot="end" routerLink="/">Olvide mi Contraseña</a>
+              <a slot="end" routerLink="/restore-password">Olvide mi Contraseña</a>
             </ion-item>
             
           </ion-list>
 
           <div class="center-container">
-            <ion-button (click)="Login()" size="default" >Ingresar</ion-button>
+            <ion-button (click)="Login()" size="default">Ingresar</ion-button>
             <ion-button fill="outline" routerLink="/registro" size="default" >Registrarme</ion-button>
           </div>
         </ion-card>

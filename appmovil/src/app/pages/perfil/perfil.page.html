@@ -9,25 +9,25 @@
 
   <ion-item>
     <ion-label position="stacked">Nombre</ion-label>
-    <ion-input value="Juan Pérez"></ion-input>
+    <ion-input [(ngModel)]="perfil.nombre"></ion-input>
   </ion-item>
 
   <ion-item>
     <ion-label position="stacked">Correo Electrónico</ion-label>
-    <ion-input value="juan.perez@ejemplo.com" type="email"></ion-input>
+    <ion-input [(ngModel)]="perfil.email" type="email"></ion-input>
   </ion-item>
 
   <ion-item>
     <ion-label position="stacked">Teléfono</ion-label>
-    <ion-input value="+1234567890" type="tel"></ion-input>
+    <ion-input [(ngModel)]="perfil.telefono" type="tel"></ion-input>
   </ion-item>
 
   <ion-item>
     <ion-label position="stacked">Dirección</ion-label>
-    <ion-textarea value="Calle Principal 123, Ciudad"></ion-textarea>
+    <ion-textarea [(ngModel)]="perfil.direccion"></ion-textarea>
   </ion-item>
 
-  <ion-button expand="block" class="ion-margin-top">
+  <ion-button expand="block" class="ion-margin-top" (click)="guardarCambios()">
     Guardar Cambios
   </ion-button>
 </ion-content>

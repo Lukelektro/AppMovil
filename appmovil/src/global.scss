@@ -27,9 +27,9 @@
 
  .custom-align-center {
     display: flex;
-    justify-content: center; /* Centers horizontally */
-    align-items: center;    /* Centers vertically */
-    height: 100%;           /* Ensure the row takes full height */
+    justify-content: center; 
+    align-items: center;    
+    height: 100%;           
   }
 
 @import "@ionic/angular/css/palettes/dark.system.css";
@@ -38,10 +38,4 @@
 @import 'swiper/scss/pagination';
 @import 'swiper/scss/navigation';
 
-.custom-align-center {
-    display: flex;
-    justify-content: center; /* Centers horizontally */
-    align-items: center;    /* Centers vertically */
-    height: 100%;           /* Ensure the row takes full height */
-  }
 
