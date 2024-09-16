@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CartService, CartItem } from 'src/app/services/cart.service';
 import { MenuController } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
 interface Producto {
@@ -16,6 +17,9 @@ interface Producto {
   styleUrls: ['./inventory.page.scss'],
 })
 export class InventoryPage implements OnInit {
+
+  filter: string = '';
+
   productos: Producto[] = [
     { id: 1, nombre: 'Comida para perros', categoria: 'Alimentos', precio: 15000 },
     { id: 2, nombre: 'Champú para gatos', categoria: 'Salud e Higiene', precio: 17000 },
@@ -30,11 +34,17 @@ export class InventoryPage implements OnInit {
   cartItems$: Observable<CartItem[]>;
   cartTotal: number = 0;
 
-  constructor(private cartService: CartService, private menuCtrl: MenuController) {
+  constructor(private cartService: CartService, private menuCtrl: MenuController, private route: ActivatedRoute) {
     this.cartItems$ = this.cartService.getCart();
   }
 
   ngOnInit() {
+    // Leer parámetros de la URL
+    this.route.queryParams.subscribe(params => {
+      this.filter = params['filter'] || 'Todos';  
+      this.categoriaActual = this.filter;
+    });
+
     this.cartItems$.subscribe(() => {
       this.cartTotal = this.cartService.getTotal();
     });

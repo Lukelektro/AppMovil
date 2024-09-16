@@ -15,7 +15,7 @@
       <ion-card-header>
         <ion-icon name="pizza" class="centered-icon"></ion-icon>
         <ion-card-title>Alimentos</ion-card-title>
-        <ion-button>Pedir!</ion-button>
+        <ion-button (click)="goToInventory('Alimentos')" >Pedir!</ion-button>
       </ion-card-header>
     </ion-card>
 
@@ -23,7 +23,7 @@
       <ion-card-header>
         <ion-icon name="nuclear" class="centered-icon"></ion-icon>
         <ion-card-title>Arenas Sanitarias</ion-card-title>
-        <ion-button>Pedir!</ion-button>
+        <ion-button (click)="goToInventory('Sanitarios')" >Pedir!</ion-button>
       </ion-card-header>
     </ion-card>
   </div>
@@ -33,7 +33,7 @@
       <ion-card-header>
         <ion-icon name="medkit" class="centered-icon"></ion-icon>
         <ion-card-title>Salud e Higiene</ion-card-title>
-        <ion-button>Pedir!</ion-button>
+        <ion-button (click)="goToInventory('Salud e Higiene')" >Pedir!</ion-button>
       </ion-card-header>
     </ion-card>
 
@@ -41,14 +41,14 @@
       <ion-card-header>
         <ion-icon name="american-football" class="centered-icon"></ion-icon>
         <ion-card-title>Juguetes</ion-card-title>
-        <ion-button>Pedir!</ion-button>
+        <ion-button (click)="goToInventory('Juguetes')" >Pedir!</ion-button>
       </ion-card-header>
     </ion-card>
   </div>
 
   <div class="contenedor-cita">
     <h3>Puedes agendar una cita para la peluquería aquí</h3>
-    <ion-button>Pedir!</ion-button>
+    <ion-button (click)="goToCitas()">Pedir!</ion-button>
   </div>
 
 </ion-content>
