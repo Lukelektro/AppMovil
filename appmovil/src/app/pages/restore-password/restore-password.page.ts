@@ -51,4 +51,8 @@ export class RestorePasswordPage {
 
     await alert.present();
   }
+
+  goBack() {
+    this.navController.back();
+  }
 }

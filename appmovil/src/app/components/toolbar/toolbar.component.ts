@@ -6,10 +6,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./toolbar.component.scss'],
 })
 export class ToolbarComponent implements OnInit {
-
   searchActive = false;
   searchQuery = '';
-  themeToggle = false; // Agregado: Variable para el toggle del tema oscuro
+  themeToggle = false; // Variable para el toggle del tema oscuro
 
   constructor() {
     this.initDarkMode();
@@ -38,6 +37,12 @@ export class ToolbarComponent implements OnInit {
 
     // Escucha los cambios en la consulta media prefers-color-scheme
     prefersDark.addEventListener('change', (mediaQuery) => this.initializeDarkTheme(mediaQuery.matches));
+
+    // Lee la preferencia del tema desde localStorage
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme) {
+      this.initializeDarkTheme(storedTheme === 'dark');
+    }
   }
 
   // Verifica/desmarca el toggle y actualiza el tema basado en isDark
@@ -49,10 +54,13 @@ export class ToolbarComponent implements OnInit {
   // Escucha el cambio del toggle para alternar el tema oscuro
   toggleChange(ev: any) {
     this.toggleDarkTheme(ev.detail.checked);
+    // Guarda la preferencia del tema en localStorage
+    localStorage.setItem('theme', ev.detail.checked ? 'dark' : 'light');
   }
 
   // Agrega o elimina la clase "dark" en el body del documento
   toggleDarkTheme(shouldAdd: boolean) {
     document.body.classList.toggle('dark', shouldAdd);
+    document.body.setAttribute('data-theme', shouldAdd ? 'dark' : 'light');
   }
 }

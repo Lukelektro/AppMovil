@@ -12,23 +12,33 @@
     <ion-label position="stacked">Nombre</ion-label>
     <ion-input [value]="perfil.nombre" (ionChange)="actualizarPerfil($event, 'nombre')"></ion-input>
   </ion-item>
+  <ion-text color="danger" *ngIf="errores.nombre">{{ errores.nombre }}</ion-text>
 
   <ion-item>
     <ion-label position="stacked">Correo Electrónico</ion-label>
     <ion-input [value]="perfil.email" type="email" (ionChange)="actualizarPerfil($event, 'email')"></ion-input>
   </ion-item>
+  <ion-text color="danger" *ngIf="errores.email">{{ errores.email }}</ion-text>
+
+  <ion-item>
+    <ion-label position="stacked">Password</ion-label>
+    <ion-input [value]="perfil.password" type="password" (ionChange)="actualizarPerfil($event, 'password')"></ion-input>
+  </ion-item>
+  <ion-text color="danger" *ngIf="errores.password">{{ errores.password }}</ion-text>
 
   <ion-item>
     <ion-label position="stacked">Teléfono</ion-label>
     <ion-input [value]="perfil.telefono" type="tel" (ionChange)="actualizarPerfil($event, 'telefono')"></ion-input>
   </ion-item>
+  <ion-text color="danger" *ngIf="errores.telefono">{{ errores.telefono }}</ion-text>
 
   <ion-item>
     <ion-label position="stacked">Dirección</ion-label>
     <ion-input [value]="perfil.direccion" (ionChange)="actualizarPerfil($event, 'direccion')"></ion-input>
   </ion-item>
+  <ion-text color="danger" *ngIf="errores.direccion">{{ errores.direccion }}</ion-text>
 
-  <ion-button expand="block" class="ion-margin-top" (click)="guardarCambios()">
+  <ion-button expand="block" class="ion-margin-top" (click)="guardarCambios()" [disabled]="!formularioValido()">
     Guardar Cambios
   </ion-button>
     

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import { Usuario } from 'src/app/models/ususario.model';
+import { Usuario } from 'src/app/models/usuario.model';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +11,8 @@ import { Usuario } from 'src/app/models/ususario.model';
 export class LoginPage {
   passwordType: string = 'password';
   passwordIcon: string = 'eye-off';
-  usuario: Usuario = new Usuario();
+  email: string = '';
+  password: string = '';
   emailInvalid = false;
   passwordInvalid = false;
 
@@ -30,8 +31,8 @@ export class LoginPage {
   }
 
   async Login() {
-    this.emailInvalid = !this.validarEmail(this.usuario.email);
-    this.passwordInvalid = !this.validarPassword(this.usuario.password);
+    this.emailInvalid = !this.validarEmail(this.email);
+    this.passwordInvalid = !this.validarPassword(this.password);
 
     if (this.emailInvalid || this.passwordInvalid) {
       return;
@@ -59,4 +60,7 @@ export class LoginPage {
     // al menos 6 caracteres
     return password.length >= 6;
   }
+
+  
+
 }

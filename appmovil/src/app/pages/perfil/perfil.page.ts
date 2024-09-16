@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonInput,AlertController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-perfil',
@@ -14,6 +14,7 @@ export class PerfilPage implements OnInit {
   perfil: any = {
     nombre: '',
     email: '',
+    password: '',
     telefono: '',
     direccion: ''
   };
@@ -21,6 +22,7 @@ export class PerfilPage implements OnInit {
   errores: any = {
     nombre: '',
     email: '',
+    password: '',
     telefono: '',
     direccion: ''
   };
@@ -59,6 +61,9 @@ export class PerfilPage implements OnInit {
       case 'email':
         this.errores.email = this.validarEmail(valor);
         break;
+      case 'password':
+        this.errores.password = this.validarPassword(valor);
+        break;
       case 'telefono':
         this.errores.telefono = this.validarTelefono(valor);
         break;
@@ -77,6 +82,10 @@ export class PerfilPage implements OnInit {
     return !regex.test(email) ? 'Email inválido' : '';
   }
 
+  validarPassword(password: string): string {
+    return password.length < 5 ? 'La contraseña debe tener al menos 5 caracteres' : '';
+  }
+
   validarTelefono(telefono: string): string {
     const regex = /^\+?[0-9]{10,14}$/;
     return !regex.test(telefono) ? 'Teléfono inválido' : '';
@@ -85,6 +94,8 @@ export class PerfilPage implements OnInit {
   validarDireccion(direccion: string): string {
     return direccion.length < 5 ? 'La dirección debe tener al menos 5 caracteres' : '';
   }
+
+  
 
   guardarCambios() {
     if (this.formularioValido()) {
@@ -99,7 +110,9 @@ export class PerfilPage implements OnInit {
   }
 
   formularioValido(): boolean {
-    return Object.values(this.errores).every(error => error === '');
+    const camposLlenos = Object.values(this.perfil).every(valor => valor !== '');
+    const sinErrores = Object.values(this.errores).every(error => error === '');
+    return camposLlenos && sinErrores;
   }
 
   async presentAlert() {

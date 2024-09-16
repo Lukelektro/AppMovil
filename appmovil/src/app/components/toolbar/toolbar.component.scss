@@ -1,36 +1,35 @@
 .icono-toolbar {
-    width: 50px;
-    height: auto; 
-  } 
+  width: 50px;
+  height: auto; 
+} 
 
-  .toolbar-center {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-  }
+.toolbar-center {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
 
-  .search-container {
-    position: absolute;
-    top: -100px; 
-    left: 0;
-    right: 0;
-    background-color: var(--ion-color-tertiary);
-    padding: 10px;
-    transition: top 0.3s ease-in-out;
-    display: flex;
-    justify-content: center;
-    z-index: 10;
-  }
+.search-container {
+  position: absolute;
+  top: -100px; 
+  left: 0;
+  right: 0;
+  padding: 10px;
+  transition: top 0.3s ease-in-out;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
 
-  .search-container.active {
-    top: 56px; /* Ajustado para coincidir con la altura estándar del toolbar de Ionic */
-  }
+.search-container.active {
+  top: 56px; /* Ajustado para coincidir con la altura estándar del toolbar de Ionic */
+}
 
-  ion-input {
-    --background: #f4f4f4;
-    --padding-start: 10px;
-    --padding-end: 10px;
-    --border-radius: 4px;
-    width: 100%;
-    max-width: 300px;
-  }
+ion-input {
+  --background: var(--ion-color-medium);
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --border-radius: 4px;
+  width: 100%;
+  max-width: 300px;
+}
