@@ -16,9 +16,9 @@ register();
 })
 export class SwiperComponent implements OnInit, AfterViewInit {
   images = [
-    { url: 'assets/img/Perro1.jpg', alt: 'Imagen 1' },
-    { url: 'assets/img/Perro2.jpg', alt: 'Imagen 2' },
-    { url: 'assets/img/Perro3.jpg', alt: 'Imagen 3' },
+    { url: 'assets/img/Perro4.png', alt: 'Imagen 1' },
+    { url: 'assets/img/Perro5.png', alt: 'Imagen 2' },
+    { url: 'assets/img/Perro6.png', alt: 'Imagen 3' },
   ];
 
   constructor() {}

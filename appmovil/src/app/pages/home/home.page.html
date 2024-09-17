@@ -2,9 +2,11 @@
   <app-toolbar [showCartButton]="false"></app-toolbar>
 </ion-header>
 
-<app-swiper></app-swiper>
+
 
 <ion-content [fullscreen]="false"> 
+
+  <app-swiper></app-swiper>
 
   <h2 class="custom-title">Bienvenido a Pet's Fancy</h2>
     
@@ -47,8 +49,8 @@
   </div>
 
   <div class="contenedor-cita">
-    <h3>Puedes agendar una cita para la peluquería aquí</h3>
-    <ion-button (click)="goToCitas()">Pedir!</ion-button>
+    <h3 class="custom-subtitle">Puedes agendar una cita para la peluquería aquí</h3>
+    <ion-button fill="outline" (click)="goToCitas()">Agendar una cita</ion-button>
   </div>
 
 </ion-content>

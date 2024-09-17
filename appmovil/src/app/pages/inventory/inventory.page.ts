@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CartService, CartItem } from 'src/app/services/cart.service';
-import { MenuController } from '@ionic/angular';
+import { MenuController,LoadingController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -34,7 +34,7 @@ export class InventoryPage implements OnInit {
   cartItems$: Observable<CartItem[]>;
   cartTotal: number = 0;
 
-  constructor(private cartService: CartService, private menuCtrl: MenuController, private route: ActivatedRoute) {
+  constructor(private cartService: CartService, private menuCtrl: MenuController, private route: ActivatedRoute, private loadingController: LoadingController) {
     this.cartItems$ = this.cartService.getCart();
   }
 
@@ -61,8 +61,15 @@ export class InventoryPage implements OnInit {
     return this.productos.filter(p => p.categoria === this.categoriaActual);
   }
 
-  addToCart(product: Producto) {
+  async addToCart(product: Producto) {
+
+    const loading = await this.loadingController.create({
+      duration: 1000
+    });
+    await loading.present();
+    await loading.onDidDismiss();
     this.cartService.addToCart(product);
+
   }
 
   removeFromCart(productId: number) {
