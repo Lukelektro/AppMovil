@@ -15,3 +15,6 @@ AppFlow
 
 ## Consideraciones
 -Se utilizara una API de base de datos, para evitar el uso local de los datos
+
+## Installs
+npm install @ionic/storage-angular
