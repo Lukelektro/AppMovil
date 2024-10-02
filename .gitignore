@@ -27,3 +27,6 @@ yarn-error.log*
 # Ignorar archivos de compilación
 build/
 dist/
+
+# Ignorar carpetas creadas por Ionic
+android/
