@@ -20,67 +20,57 @@ export class LoginPage {
   constructor(
     private router: Router,
     private loadingController: LoadingController,
-    private servicioAlmacenamiento: ServicioAlmacenamiento // Storage Service, en español porque me pierdo.
+    private servicioAlmacenamiento: ServicioAlmacenamiento
   ) {}
 
   async ngOnInit() {
-    await this.cargarCredenciales();
-    this.verificarAutenticacion();
+    await this.cargarCredenciales(); // Cargar credenciales almacenadas
   }
 
-  // Cargamos email y password del StorageService
+  // Cargar credenciales almacenadas
   async cargarCredenciales() {
     const emailAlmacenado = await this.servicioAlmacenamiento.obtener('email');
     const passwordAlmacenado = await this.servicioAlmacenamiento.obtener('password');
     const recordar = await this.servicioAlmacenamiento.obtener('rememberMe');
 
-    if (emailAlmacenado) {
+    if (emailAlmacenado && passwordAlmacenado && recordar) {
+      // Si se encuentra recordar, asignar valores y redirigir
       this.email = emailAlmacenado;
-    }
-
-    if (passwordAlmacenado) {
       this.password = passwordAlmacenado;
-    }
+      this.rememberMe = recordar;
 
-    this.rememberMe = !!recordar;
+      // Ejecutar automáticamente iniciar sesión
+      this.iniciarSesion(true); // Pasamos true para evitar doble carga
+    }
   }
-
-    async verificarAutenticacion() {
-      const recordar = await this.servicioAlmacenamiento.obtener('rememberMe');
-  
-      if (recordar) {
-        this.router.navigate(['/tab/home']);
-      }
-    }
 
   // Alternar visibilidad de la contraseña
   mostrarPassword() {
-    if (this.passwordType === 'password') {
-      this.passwordType = 'text';
-      this.passwordIcon = 'eye';
-    } else {
-      this.passwordType = 'password';
-      this.passwordIcon = 'eye-off';
-    }
+    this.passwordType = this.passwordType === 'password' ? 'text' : 'password';
+    this.passwordIcon = this.passwordIcon === 'eye-off' ? 'eye' : 'eye-off';
   }
 
   // Lógica de login
-  async iniciarSesion() {
-    this.emailInvalid = !this.validarEmail(this.email);
-    this.passwordInvalid = !this.validarPassword(this.password);
+  async iniciarSesion(autologin = false) {
+    // Si se trata de un login automático, no mostrar el loader
+    if (!autologin) {
+      const loading = await this.loadingController.create({
+        duration: 3000,
+      });
 
-    if (this.emailInvalid || this.passwordInvalid) {
-      return;
+      await loading.present();
+      await loading.onDidDismiss();
     }
 
-    const loading = await this.loadingController.create({
-      duration: 3000
-    });
+    // Validar los campos (evitamos la validación en autologin para no bloquear)
+    if (!autologin) {
+      this.emailInvalid = !this.validarEmail(this.email);
+      this.passwordInvalid = !this.validarPassword(this.password);
 
-    await loading.present();
-    
-    // Esperar a que el loading termine
-    await loading.onDidDismiss();
+      if (this.emailInvalid || this.passwordInvalid) {
+        return;
+      }
+    }
 
     // Guardar credenciales si "Recuérdame" está seleccionado
     if (this.rememberMe) {
@@ -99,7 +89,7 @@ export class LoginPage {
 
   // Validar el formato del email
   validarEmail(email: string): boolean {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex para validar el email
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
   }
 
