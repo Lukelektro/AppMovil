@@ -25,21 +25,25 @@
               <ion-text color="danger" *ngIf="emailInvalid">Email inválido</ion-text>
             </ion-item>
             <ion-item>
-              <ion-input [type]="passwordType" [(ngModel)]="password" labelPlacement="stacked" label="Password" placeholder="Password">
+              <ion-input [type]="passwordType" [(ngModel)]="password" labelPlacement="stacked" label="Contraseña" placeholder="Contraseña">
                 <ion-icon slot="start" name="lock-closed" aria-hidden="true"></ion-icon>
-                <ion-button fill="clear" slot="end" aria-label="Show/hide" (click)="MostrarPassword()">
+                <ion-button fill="clear" slot="end" aria-label="Mostrar/ocultar" (click)="mostrarPassword()">
                   <ion-icon slot="icon-only" [name]="passwordIcon" aria-hidden="true"></ion-icon>
                 </ion-button>
               </ion-input>
             </ion-item>
             <ion-item>
               <ion-text color="danger" *ngIf="passwordInvalid">Contraseña inválida</ion-text>
-              <a slot="end" routerLink="/restore-password">Olvide mi Contraseña</a>
+              <a slot="end" routerLink="/restore-password">Olvidé mi contraseña</a>
             </ion-item>
+            <ion-item>
+              <ion-label>Recuérdame</ion-label>
+              <ion-checkbox [(ngModel)]="rememberMe" name="rememberMe"></ion-checkbox>
+            </ion-item>          
           </ion-list>
 
           <div class="center-container">
-            <ion-button (click)="Login()" size="default">Ingresar</ion-button>
+            <ion-button (click)="iniciarSesion()" size="default">Ingresar</ion-button>
             <ion-button fill="outline" routerLink="/registro" size="default">Registrarme</ion-button>
           </div>
         </ion-card>

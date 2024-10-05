@@ -18,3 +18,4 @@ AppFlow
 
 ## Installs
 npm install @ionic/storage-angular
+npm install cordova-sqlite-storage
