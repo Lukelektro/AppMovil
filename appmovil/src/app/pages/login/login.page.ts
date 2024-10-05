@@ -25,6 +25,11 @@ export class LoginPage {
 
   async ngOnInit() {
     await this.cargarCredenciales(); // Cargar credenciales almacenadas
+    if (this.rememberMe) {
+      setTimeout(() => {
+        this.iniciarSesion(true); 
+      }, 500);
+    }    
   }
 
   // Cargar credenciales almacenadas
