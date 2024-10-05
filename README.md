@@ -19,5 +19,6 @@ AppFlow
 ## Installs
 npm install @ionic/storage-angular
 npm install cordova-sqlite-storage
+npm install @capacitor-community/sqlite
 npx cap sync
 npm install -g cordova-res
