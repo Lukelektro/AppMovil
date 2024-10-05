@@ -1,0 +1,6 @@
+{
+  "appId": "com.petshopfancy.app",
+  "appName": "Petshop Fancy",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
