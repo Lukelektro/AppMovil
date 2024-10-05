@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+ import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 
 @Injectable({
@@ -32,7 +32,7 @@ export class ServicioAlmacenamiento {
 
   // Obtener un valor del almacenamiento
   public async obtener(key: string): Promise<any> {
-    await this.asegurarAlmacenamientoInicializado(); 
+    await this.asegurarAlmacenamientoInicializado();
     return this._almacenamiento?.get(key);
   }
 

@@ -13,7 +13,7 @@ export class LoginPage {
   passwordIcon: string = 'eye-off';
   email: string = '';
   password: string = '';
-  rememberMe: boolean = false; // Para manejar el estado del checkbox
+  rememberMe: boolean = false;
   emailInvalid = false;
   passwordInvalid = false;
 
@@ -23,14 +23,16 @@ export class LoginPage {
     private servicioAlmacenamiento: ServicioAlmacenamiento // Storage Service, en español porque me pierdo.
   ) {}
 
-  ngOnInit() {
-    this.cargarCredenciales(); // Cargar credenciales almacenadas al iniciar
+  async ngOnInit() {
+    await this.cargarCredenciales();
+    this.verificarAutenticacion();
   }
 
   // Cargamos email y password del StorageService
   async cargarCredenciales() {
     const emailAlmacenado = await this.servicioAlmacenamiento.obtener('email');
     const passwordAlmacenado = await this.servicioAlmacenamiento.obtener('password');
+    const recordar = await this.servicioAlmacenamiento.obtener('rememberMe');
 
     if (emailAlmacenado) {
       this.email = emailAlmacenado;
@@ -40,8 +42,16 @@ export class LoginPage {
       this.password = passwordAlmacenado;
     }
 
-    this.rememberMe = !!emailAlmacenado; // Si hay email almacenado, recordar credenciales
+    this.rememberMe = !!recordar;
   }
+
+    async verificarAutenticacion() {
+      const recordar = await this.servicioAlmacenamiento.obtener('rememberMe');
+  
+      if (recordar) {
+        this.router.navigate(['/tab/home']);
+      }
+    }
 
   // Alternar visibilidad de la contraseña
   mostrarPassword() {
@@ -68,17 +78,19 @@ export class LoginPage {
     });
 
     await loading.present();
-
+    
     // Esperar a que el loading termine
     await loading.onDidDismiss();
 
     // Guardar credenciales si "Recuérdame" está seleccionado
     if (this.rememberMe) {
-      this.servicioAlmacenamiento.establecer('email', this.email);
-      this.servicioAlmacenamiento.establecer('password', this.password); // Puedes eliminar esta línea si no quieres guardar la contraseña
+      await this.servicioAlmacenamiento.establecer('email', this.email);
+      await this.servicioAlmacenamiento.establecer('password', this.password);
+      await this.servicioAlmacenamiento.establecer('rememberMe', this.rememberMe);
     } else {
-      this.servicioAlmacenamiento.eliminar('email');
-      this.servicioAlmacenamiento.eliminar('password');
+      await this.servicioAlmacenamiento.eliminar('email');
+      await this.servicioAlmacenamiento.eliminar('password');
+      await this.servicioAlmacenamiento.eliminar('rememberMe');
     }
 
     // Navegar a la siguiente página
