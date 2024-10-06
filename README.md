@@ -28,3 +28,9 @@ ionic build
 npx cap sync android
 npx cap open android, abre android studio
 npx cap run android, utiliza otro emulador x
+
+## Ejecucion en IOS
+ionic build
+npx cap sync ios
+npx cap open ios, abre xcode
+npx cap run ios, utiliza otro emulador x
