@@ -9,6 +9,7 @@ plugins/
 
 # Ignorar la carpeta "www"
 www/
+dist/
 
 # Ignorar archivos de configuración específicos del entorno
 .env
@@ -18,6 +19,7 @@ www/
 # Ignorar archivos de configuración de IDE
 .vscode/
 .idea/
+.DS_Store/
 
 # Ignorar archivos de logs
 npm-debug.log*
@@ -30,3 +32,4 @@ dist/
 
 # Ignorar carpetas creadas por Ionic
 android/
+ios/

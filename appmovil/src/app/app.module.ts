@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms'; // Importa FormsModule
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { ComponentsModule } from './components/components.module'; 
+import { IonicStorageModule } from '@ionic/storage-angular';
 
 @NgModule({
   declarations: [AppComponent],
@@ -17,6 +18,7 @@ import { ComponentsModule } from './components/components.module';
     ComponentsModule,
     ReactiveFormsModule,
     FormsModule,
+    IonicStorageModule.forRoot()
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }

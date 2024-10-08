@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
+import { ServicioAlmacenamiento } from '../../services/storage.service';
 
 @Component({
   selector: 'app-login',
@@ -12,54 +13,93 @@ export class LoginPage {
   passwordIcon: string = 'eye-off';
   email: string = '';
   password: string = '';
+  rememberMe: boolean = false;
   emailInvalid = false;
   passwordInvalid = false;
 
-  constructor(private router: Router, private loadingController: LoadingController) {}
+  constructor(
+    private router: Router,
+    private loadingController: LoadingController,
+    private servicioAlmacenamiento: ServicioAlmacenamiento
+  ) {}
 
-  ngOnInit() {}
+  async ngOnInit() {
+    await this.cargarCredenciales(); // Cargar credenciales almacenadas
+    if (this.rememberMe) {
+      setTimeout(() => {
+        this.iniciarSesion(true); 
+      }, 500);
+    }    
+  }
 
-  MostrarPassword() {
-    if (this.passwordType === 'password') {
-      this.passwordType = 'text';
-      this.passwordIcon = 'eye';
-    } else {
-      this.passwordType = 'password';
-      this.passwordIcon = 'eye-off';
+  // Cargar credenciales almacenadas
+  async cargarCredenciales() {
+    const emailAlmacenado = await this.servicioAlmacenamiento.obtener('email');
+    const passwordAlmacenado = await this.servicioAlmacenamiento.obtener('password');
+    const recordar = await this.servicioAlmacenamiento.obtener('rememberMe');
+
+    if (emailAlmacenado && passwordAlmacenado && recordar) {
+      // Si se encuentra recordar, asignar valores y redirigir
+      this.email = emailAlmacenado;
+      this.password = passwordAlmacenado;
+      this.rememberMe = recordar;
+
+      // Ejecutar automáticamente iniciar sesión
+      this.iniciarSesion(true); // Pasamos true para evitar doble carga
     }
   }
 
-  async Login() {
-    this.emailInvalid = !this.validarEmail(this.email);
-    this.passwordInvalid = !this.validarPassword(this.password);
+  // Alternar visibilidad de la contraseña
+  mostrarPassword() {
+    this.passwordType = this.passwordType === 'password' ? 'text' : 'password';
+    this.passwordIcon = this.passwordIcon === 'eye-off' ? 'eye' : 'eye-off';
+  }
 
-    if (this.emailInvalid || this.passwordInvalid) {
-      return;
+  // Lógica de login
+  async iniciarSesion(autologin = false) {
+    // Si se trata de un login automático, no mostrar el loader
+    if (!autologin) {
+      const loading = await this.loadingController.create({
+        duration: 3000,
+      });
+
+      await loading.present();
+      await loading.onDidDismiss();
     }
 
-    const loading = await this.loadingController.create({
-      duration: 3000
-    });
+    // Validar los campos (evitamos la validación en autologin para no bloquear)
+    if (!autologin) {
+      this.emailInvalid = !this.validarEmail(this.email);
+      this.passwordInvalid = !this.validarPassword(this.password);
 
-    await loading.present();
+      if (this.emailInvalid || this.passwordInvalid) {
+        return;
+      }
+    }
 
-    // Esperar a que el loading se dismissee
-    await loading.onDidDismiss();
+    // Guardar credenciales si "Recuérdame" está seleccionado
+    if (this.rememberMe) {
+      await this.servicioAlmacenamiento.establecer('email', this.email);
+      await this.servicioAlmacenamiento.establecer('password', this.password);
+      await this.servicioAlmacenamiento.establecer('rememberMe', this.rememberMe);
+    } else {
+      await this.servicioAlmacenamiento.eliminar('email');
+      await this.servicioAlmacenamiento.eliminar('password');
+      await this.servicioAlmacenamiento.eliminar('rememberMe');
+    }
 
-    // Lógica para ingresar
+    // Navegar a la siguiente página
     this.router.navigate(['/tab/home']);
   }
 
+  // Validar el formato del email
   validarEmail(email: string): boolean {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //codigo regex pa validar el email
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
   }
 
+  // Validar que la contraseña tenga al menos 6 caracteres
   validarPassword(password: string): boolean {
-    // al menos 6 caracteres
     return password.length >= 6;
   }
-
-  
-
 }
