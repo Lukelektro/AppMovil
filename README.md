@@ -22,3 +22,9 @@ npm install cordova-sqlite-storage
 npm install @capacitor-community/sqlite
 npx cap sync
 npm install -g cordova-res
+
+## Ejecucion en Android
+ionic build
+npx cap sync android
+npx cap open android, abre android studio
+npx cap run android, utiliza otro emulador x
