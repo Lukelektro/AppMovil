@@ -1,51 +1,13 @@
-ion-tab-bar.rainbow-tab-bar {
-    background-color: var(--ion-color-light);
-    border-radius: 50% 50% 0 0;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-    margin: 0 auto;
-    padding: 20px 10px 5px 10px;
-    width: 90%;
-    max-width: 250px;
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .main-button {
-    background-color: var(--ion-color-primary);
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    position: relative;
-    z-index: 10;
-  }
+ion-tab-bar {
+  --color-selected: black;
+  --color: #8e8e93;
+}
 
-  .panda-options {
-    position: relative;
-    width: 100%; /* Asegura que el contenedor tenga el ancho completo */
-    text-align: center; /* Centra los contenidos */
-    transition: all 0.5s ease;
-  
-    .panda-finger {
-      position: absolute;
-      bottom: 0;
-      opacity: 0;
-      transform: translateY(100%);
-      transition: opacity 0.5s ease, transform 0.5s ease;
-  
-      /* Centra cada botón respecto al contenedor */
-      &:nth-child(1) { left: 10%; }
-      &:nth-child(2) { left: 30%; }
-      &:nth-child(3) { left: 50%; transform: translateX(-50%) translateY(100%); } /* Ajuste para centrar exactamente el botón del medio */
-      &:nth-child(4) { left: 70%; }
-      &:nth-child(5) { left: 90%; }
-    }
-  
-    &.expanded .panda-finger {
-      opacity: 1;
-      transform: translateY(-150%); /* Aumenta el valor para que suban más */
-    }
+ion-tab-button {
+  --ripple-color: transparent;
+  font-size: 12px;
+}
+
+ion-icon {
+  font-size: 24px;
 }
