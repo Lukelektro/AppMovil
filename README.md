@@ -22,6 +22,7 @@ npm install cordova-sqlite-storage
 npm install @capacitor-community/sqlite
 npx cap sync
 npm install -g cordova-res
+npm install firebase @angular/fire
 
 ## Ejecucion en Android
 ionic build
