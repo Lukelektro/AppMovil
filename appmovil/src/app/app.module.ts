@@ -9,6 +9,16 @@ import { AppRoutingModule } from './app-routing.module';
 import { ComponentsModule } from './components/components.module'; 
 import { IonicStorageModule } from '@ionic/storage-angular';
 
+//Firebase
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { getAnalytics, provideAnalytics, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
+import { environment } from 'src/environments/environment.prod';
+
+
+
 @NgModule({
   declarations: [AppComponent],
   imports: [
@@ -19,9 +29,16 @@ import { IonicStorageModule } from '@ionic/storage-angular';
     ReactiveFormsModule,
     FormsModule,
     IonicStorageModule.forRoot()
+
   ],
   providers: [
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+    provideAuth(() => getAuth()),
+    provideAnalytics(() => getAnalytics()),
+    provideFirestore(() => getFirestore()),
+    ScreenTrackingService,
+    UserTrackingService,
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA] 

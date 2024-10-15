@@ -9,6 +9,15 @@
   <app-swiper></app-swiper>
 
   <h2 class="custom-title">Bienvenido a Pet's Fancy</h2>
+
+  <ion-list>
+    <ion-item *ngFor="let producto of productos" >
+      <ion-label>
+        <h2>Nombre: {{producto.nombre}}</h2>
+        <p>valor: {{producto.valor}}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
     
   <h3 class="custom-subtitle">Principales categorías</h3>
 
