@@ -8,12 +8,6 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { ComponentsModule } from './components/components.module'; 
 import { IonicStorageModule } from '@ionic/storage-angular';
-// Importar Firebase
-import { initializeApp, FirebaseAppModule } from '@angular/fire/app';
-import { provideAuth, getAuth } from '@angular/fire/auth';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
-import { provideStorage, getStorage } from '@angular/fire/storage';
-import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent],
@@ -24,14 +18,10 @@ import { environment } from '../environments/environment';
     ComponentsModule,
     ReactiveFormsModule,
     FormsModule,
-    IonicStorageModule.forRoot(),
-    FirebaseAppModule.initializeApp(environment.firebaseConfig)
+    IonicStorageModule.forRoot()
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    { provide: getAuth, useFactory: () => getAuth() },
-    { provide: getFirestore, useFactory: () => getFirestore() },
-    { provide: getStorage, useFactory: () => getStorage() }
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA] 
