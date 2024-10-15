@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
+import { AuthService } from '../../services/auth.service';  // Importar AuthService
 
 @Component({
   selector: 'app-perfil',
   templateUrl: './perfil.page.html',
   styleUrls: ['./perfil.page.scss'],
 })
-
 export class PerfilPage implements OnInit {
 
-  constructor(private alertController: AlertController) {}
+  constructor(private alertController: AlertController, private authService: AuthService) {}  // Inyectar el servicio AuthService
 
   perfil: any = {
     nombre: '',
@@ -32,7 +32,6 @@ export class PerfilPage implements OnInit {
   }
 
   cargarPerfil() {
-
     const perfilGuardado = localStorage.getItem('perfil');
     if (perfilGuardado) {
       this.perfil = JSON.parse(perfilGuardado);
@@ -44,7 +43,6 @@ export class PerfilPage implements OnInit {
         direccion: 'Calle Principal 123, Ciudad'
       };
     }
-
   }
 
   actualizarPerfil(evento: any, campo: string) {
@@ -95,14 +93,10 @@ export class PerfilPage implements OnInit {
     return direccion.length < 5 ? 'La dirección debe tener al menos 5 caracteres' : '';
   }
 
-  
-
   guardarCambios() {
     if (this.formularioValido()) {
       localStorage.setItem('perfil', JSON.stringify(this.perfil));
-
       this.presentAlert();
-      
       console.log('Cambios guardados:', this.perfil);
     } else {
       console.log('El formulario contiene errores');
@@ -118,13 +112,15 @@ export class PerfilPage implements OnInit {
   async presentAlert() {
     const alert = await this.alertController.create({
       header: 'Perfil Editado',
-      message: 'Se ha editato su perfil correctamente',
-      buttons: [{
-        text: 'OK',
-      }]
+      message: 'Se ha editado su perfil correctamente',
+      buttons: [{ text: 'OK' }]
     });
 
     await alert.present();
   }
 
+  // Método para cerrar sesión (importado del servicio AuthService)
+  logout() {
+    this.authService.logout();
+  }
 }

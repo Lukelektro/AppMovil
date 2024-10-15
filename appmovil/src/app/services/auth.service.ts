@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { ServicioAlmacenamiento } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +8,7 @@ import { Router } from '@angular/router';
 export class AuthService {
   private estaAutenticado: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private servicioAlmacenamiento: ServicioAlmacenamiento) {}
 
   // Método para iniciar sesión
   login(email: string, password: string): boolean {
@@ -26,8 +27,17 @@ export class AuthService {
   }
 
   // Método para salir (no implementado aun)
-  logout() {
+  async logout() {
     this.estaAutenticado = false;
+
+    // Eliminar las credenciales almacenadas cuando se cierre sesión
+    /* plantie en este caso, que el usuario final quien cierra sesion, no quiere realmente que se eliminen las credenciales
+    quizas esto es un error, pero es una idea que se me ocurrio, si se quiere que se eliminen las credenciales, descomentar las siguientes lineas
+    await this.servicioAlmacenamiento.eliminar('email');
+    await this.servicioAlmacenamiento.eliminar('password');
+    */
+    await this.servicioAlmacenamiento.eliminar('rememberMe');
+
     this.router.navigate(['/login']);
   }
 

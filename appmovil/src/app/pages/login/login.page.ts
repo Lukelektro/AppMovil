@@ -70,22 +70,28 @@ export class LoginPage {
   
   // Método asincrónico para iniciar sesión
   async iniciarSesion(autologin = false) {
+    let loading: HTMLIonLoadingElement | null = null;
+
     try {
-      // Si NO estuvo marcado el recuerdame, se aplican las primeras dos condiciones
-      // el loading con un mensajito para el usuario
+      // Si NO estuvo marcado el autologin, se presenta el loading con un mensajito
       if (!autologin) {
-        const loading = await this.loadingController.create({
+        loading = await this.loadingController.create({
           message: 'Iniciando sesión...', // Mensaje para el usuario
           duration: 3000,
         });
         await loading.present();
       }
+
+      // Realizar la validación solo si no es autologin
       if (!autologin) {
         this.emailInvalid = !this.validarEmail(this.email);
         this.passwordInvalid = !this.validarPassword(this.password);
 
-        // Mostrar mensaje de error si los campos son inválidos (en caso de cambio de contraseña, para futuro uso)
+        // Si hay errores en el email o la contraseña, cerrar el loading y mostrar el mensaje de error
         if (this.emailInvalid || this.passwordInvalid) {
+          if (loading) {
+            await loading.dismiss(); // Cerrar el mensaje "Iniciando sesión..."
+          }
           this.mostrarMensajeError('Por favor, revisa tu correo y contraseña.');
           return;
         }
@@ -96,12 +102,22 @@ export class LoginPage {
 
       if (loginExitoso) {
         await this.gestionarCredenciales();
+        if (loading) {
+          await loading.dismiss();
+        }
         this.router.navigate(['/tab/home']);
       } else {
+        if (loading) {
+          await loading.dismiss();
+        }
         this.mostrarMensajeError('Credenciales incorrectas. Intenta de nuevo.');
       }
+
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
+      if (loading) {
+        await loading.dismiss();
+      }
       this.mostrarMensajeError('Ocurrió un error al intentar iniciar sesión.');
     }
   }
