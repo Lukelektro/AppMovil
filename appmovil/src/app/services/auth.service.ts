@@ -25,7 +25,7 @@ export class AuthService {
     return false; // Credenciales incorrectas
   }
 
-  // Método para salir
+  // Método para salir (no implementado aun)
   logout() {
     this.estaAutenticado = false;
     this.router.navigate(['/login']);
