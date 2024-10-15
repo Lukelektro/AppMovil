@@ -27,8 +27,8 @@
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
-    "strictInjectionParameters": false,  // Relajado para evitar problemas de inyección
-    "strictInputAccessModifiers": false,  // Relajado para evitar errores con los templates
-    "strictTemplates": false              // Desactivado para evitar problemas con templates estrictos
+    "strictInjectionParameters": false,  
+    "strictInputAccessModifiers": false,  
+    "strictTemplates": true              
   }
 }
