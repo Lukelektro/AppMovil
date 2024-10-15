@@ -1,13 +1,56 @@
+ion-tabs {
+  --background: transparent;
+  overflow: visible;
+}
+
 ion-tab-bar {
-  --color-selected: black;
-  --color: #8e8e93;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  --background: transparent;
+  border-radius: 25px 25px 25px 25px;
+  --color-selected: var(--ion-color-light);
+  --color: var(--ion-color-light-contrast);
+  border: 0;
+  overflow: visible;
+  z-index: 1;
+  padding-top: 10px; //parche trucho para que la wea de boton no se corte
 }
 
 ion-tab-button {
-  --ripple-color: transparent;
-  font-size: 12px;
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-light);
+  --color-selected: var(--ion-color-primary-contrast);
+}
+
+.activity{
+  border-top-left-radius: 25px;
+}
+
+.search{
+  border-top-right-radius: 25px;
 }
 
 ion-icon {
   font-size: 24px;
+}
+
+ion-fab-button {
+  --background: linear-gradient(135deg,
+    var(--ion-color-primary),
+    var(--ion-color-secondary),
+    var(--ion-color-tertiary));
+}
+
+ion-fab-button ion-icon {
+  font-size: 20px;
+}
+
+svg {
+  width: 90px;
+  margin-top: 17px;
+}
+
+svg path {
+  fill: var(--ion-color-primary);
 }
