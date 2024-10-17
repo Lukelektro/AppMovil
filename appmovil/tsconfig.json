@@ -4,6 +4,7 @@
     "esModuleInterop": true,
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
+    "strictNullChecks": false,
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,

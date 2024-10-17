@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 export interface CartItem {
-  id: number;
+  id: string;
   nombre: string;
-  precio: number;
+  valor: number;
   cantidad: number;
 }
 
@@ -20,7 +20,7 @@ export class CartService {
     return this.cartSubject.asObservable();
   }
 
-  addToCart(product: { id: number, nombre: string, precio: number }) {
+  addToCart(product: { id: string, nombre: string, valor: number }) {
     const itemIndex = this.cartItems.findIndex(item => item.id === product.id);
     if (itemIndex > -1) {
       this.cartItems[itemIndex].cantidad += 1;
@@ -30,7 +30,7 @@ export class CartService {
     this.cartSubject.next([...this.cartItems]);
   }
 
-  removeFromCart(productId: number) {
+  removeFromCart(productId: string) {
     const index = this.cartItems.findIndex(item => item.id === productId);
     if (index > -1) {
       if (this.cartItems[index].cantidad > 1) {
@@ -43,6 +43,6 @@ export class CartService {
   }
 
   getTotal() {
-    return this.cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);
+    return this.cartItems.reduce((total, item) => total + item.valor * item.cantidad, 0);
   }
 }

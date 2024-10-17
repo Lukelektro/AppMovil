@@ -1,3 +1,4 @@
+<!-- registro.page.html -->
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -10,34 +11,34 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <div class="centered-container">
-
+    
     <ion-item>
       <ion-label position="stacked">Nombre</ion-label>
-      <ion-input [value]="perfil.nombre" (ionChange)="crearPerfil($event, 'nombre')"></ion-input>
+      <ion-input [value]="newUsuario.nombre" (ionChange)="crearUsuario($event, 'nombre')"></ion-input>
     </ion-item>
     <ion-text color="danger" *ngIf="errores.nombre">{{ errores.nombre }}</ion-text>
   
     <ion-item>
       <ion-label position="stacked">Correo Electrónico</ion-label>
-      <ion-input [value]="perfil.email" type="email" (ionChange)="crearPerfil($event, 'email')"></ion-input>
+      <ion-input [value]="newUsuario.email" type="email" (ionChange)="crearUsuario($event, 'email')"></ion-input>
     </ion-item>
     <ion-text color="danger" *ngIf="errores.email">{{ errores.email }}</ion-text>
 
     <ion-item>
       <ion-label position="stacked">Password</ion-label>
-      <ion-input [value]="perfil.password" type="password" (ionChange)="crearPerfil($event, 'password')"></ion-input>
+      <ion-input [value]="newUsuario.password" type="password" (ionChange)="crearUsuario($event, 'password')"></ion-input>
     </ion-item>
     <ion-text color="danger" *ngIf="errores.password">{{ errores.password }}</ion-text>
   
     <ion-item>
       <ion-label position="stacked">Teléfono</ion-label>
-      <ion-input [value]="perfil.telefono" type="tel" (ionChange)="crearPerfil($event, 'telefono')"></ion-input>
+      <ion-input [value]="newUsuario.telefono" type="tel" (ionChange)="crearUsuario($event, 'telefono')"></ion-input>
     </ion-item>
     <ion-text color="danger" *ngIf="errores.telefono">{{ errores.telefono }}</ion-text>
   
     <ion-item>
       <ion-label position="stacked">Dirección</ion-label>
-      <ion-input [value]="perfil.direccion" (ionChange)="crearPerfil($event, 'direccion')"></ion-input>
+      <ion-input [value]="newUsuario.direccion" (ionChange)="crearUsuario($event, 'direccion')"></ion-input>
     </ion-item>
     <ion-text color="danger" *ngIf="errores.direccion">{{ errores.direccion }}</ion-text>
   

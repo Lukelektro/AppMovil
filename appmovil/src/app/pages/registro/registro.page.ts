@@ -1,14 +1,32 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, AlertController } from '@ionic/angular';
+import { Usuario } from 'src/app/models/usuario.model';
+import { IonInput } from '@ionic/angular';
+import { FirestoreService } from 'src/app/services/firestore.service';
+import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
+
+
+// Definimos un tipo para los campos del formulario
+type CamposFormulario = 'nombre' | 'email' | 'password' | 'telefono' | 'direccion';
 
 @Component({
   selector: 'app-registro',
   templateUrl: './registro.page.html',
   styleUrls: ['./registro.page.scss'],
 })
+
 export class RegistroPage implements OnInit {
 
-  perfil: any = {
+  newUsuario: Usuario = {
+    id:  this.firestoreService.createIdDoc(),
+    nombre: null,
+    email: null,
+    password: null,
+    telefono: null,
+    direccion: null,
+  };
+
+  errores: {[key in CamposFormulario]: string} = {
     nombre: '',
     email: '',
     password: '',
@@ -16,30 +34,25 @@ export class RegistroPage implements OnInit {
     direccion: ''
   };
 
-  errores: any = {
-    nombre: '',
-    email: '',
-    password: '',
-    telefono: '',
-    direccion: ''
-  };
-
-  constructor(private navController: NavController, private alertController: AlertController) { }
+  constructor(
+    private navController: NavController, 
+    private alertController: AlertController,
+    private firestoreService: FirestoreService,
+    private auth: Auth
+  ) { }
 
   ngOnInit() {
+    console.log('Firebase Auth inicializado:', this.auth);
   }
 
-  onSubmit() {
-  
-  }
-
-  crearPerfil(evento: any, campo: string) {
-    const valor = evento.detail.value;
-    this.perfil[campo] = valor;
+  crearUsuario(evento: CustomEvent, campo: CamposFormulario) {
+    const valor = evento.detail.value?.toString() || '';
+    this.newUsuario[campo] = valor;
     this.validarCampo(campo, valor);
+
   }
 
-  validarCampo(campo: string, valor: string) {
+  validarCampo(campo: CamposFormulario, valor: string) {
     switch (campo) {
       case 'nombre':
         this.errores.nombre = this.validarNombre(valor);
@@ -82,18 +95,28 @@ export class RegistroPage implements OnInit {
   }
 
   formularioValido(): boolean {
-    const camposLlenos = Object.values(this.perfil).every(valor => valor !== '');
+    const camposLlenos = Object.values(this.newUsuario).every(valor => valor !== '');
     const sinErrores = Object.values(this.errores).every(error => error === '');
     return camposLlenos && sinErrores;
   }
 
-  guardarCambios() {
-    if (this.formularioValido()) {
-      localStorage.setItem('perfil', JSON.stringify(this.perfil));
+  async guardarCambios() {
 
-      this.presentAlert();
-      
-      console.log('Cambios guardados:', this.perfil);
+    console.log(this.newUsuario); //para ver el usuairo si entra xd hay que borrar depsues
+
+    if (this.formularioValido()) {
+      try {
+        
+        //Guardar en Firestore
+        await this.firestoreService.createDocumentID(this.newUsuario,'Usuarios',this.newUsuario.id);
+
+        await this.presentAlert();
+        console.log('Usuario creado exitosamente');
+        
+      } catch (error: any) {
+        console.error('Error al crear usuario:', error);
+
+      }
     } else {
       console.log('El formulario contiene errores');
     }

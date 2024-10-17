@@ -3,13 +3,10 @@ import { CartService, CartItem } from 'src/app/services/cart.service';
 import { MenuController,LoadingController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
+import { FirestoreService } from 'src/app/services/firestore.service';
+import { Producto } from 'src/app/models/producto';
 
-interface Producto {
-  id: number;
-  nombre: string;
-  categoria: string;
-  precio: number;
-}
+
 
 @Component({
   selector: 'app-inventory',
@@ -20,25 +17,35 @@ export class InventoryPage implements OnInit {
 
   filter: string = '';
 
-  productos: Producto[] = [
-    { id: 1, nombre: 'Comida para perros', categoria: 'Alimentos', precio: 15000 },
-    { id: 2, nombre: 'Champú para gatos', categoria: 'Salud e Higiene', precio: 17000 },
-    { id: 3, nombre: 'Juguete para roedores', categoria: 'Juguetes', precio: 12000 },
-    { id: 4, nombre: 'Antiparasitario', categoria: 'Salud e Higiene', precio: 20000 },
-    { id: 5, nombre: 'Toallitas húmedas', categoria: 'Sanitarios', precio: 5000 },
-  ];
+  productos: Producto[] = [];
 
-  categorias = ['Todos', 'Alimentos', 'Sanitarios', 'Salud e Higiene', 'Juguetes'];
+  CargarProductos() {
+
+    this.firestoreService.getItemsChanges<Producto>('Productos').subscribe( data => {
+
+      if (data) {
+        this.productos = data
+      }
+      
+    });
+
+  }
+
+  categorias = this.productos;
   categoriaActual = 'Todos';
   
   cartItems$: Observable<CartItem[]>;
   cartTotal: number = 0;
 
-  constructor(private cartService: CartService, private menuCtrl: MenuController, private route: ActivatedRoute, private loadingController: LoadingController) {
+  constructor(private cartService: CartService, private menuCtrl: MenuController, private route: ActivatedRoute, private loadingController: LoadingController, private firestoreService: FirestoreService) {
     this.cartItems$ = this.cartService.getCart();
   }
 
   ngOnInit() {
+
+    this.CargarProductos();
+
+
     // Leer parámetros de la URL
     this.route.queryParams.subscribe(params => {
       this.filter = params['filter'] || 'Todos';  
@@ -72,7 +79,7 @@ export class InventoryPage implements OnInit {
 
   }
 
-  removeFromCart(productId: number) {
+  removeFromCart(productId: string) {
     this.cartService.removeFromCart(productId);
   }
 
