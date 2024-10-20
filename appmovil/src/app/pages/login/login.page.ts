@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { ServicioAlmacenamiento } from '../../services/storage.service';
+import { FirestoreService } from 'src/app/services/firestore.service';
 import { AuthService } from '../../services/auth.service'; // servicio de autentificacion
 import { ToastController } from '@ionic/angular';
 
@@ -23,6 +24,7 @@ export class LoginPage {
     private router: Router,
     private loadingController: LoadingController,
     private servicioAlmacenamiento: ServicioAlmacenamiento,
+    private FirestoreService: FirestoreService,
     private authService: AuthService,
     private toastController: ToastController 
   ) {
@@ -43,84 +45,87 @@ export class LoginPage {
     }
   }
 
-  // Metodo asincronico para cargar las credenciales
+  // Método asincrónico para cargar las credenciales desde Firebase
   async cargarCredenciales(): Promise<boolean> {
     try {
-      // Hacer todas las llamadas de una vez para mejorar el rendimiento (gracias joaco))
-      const [emailAlmacenado, passwordAlmacenado, recordar] = await Promise.all([
-        this.servicioAlmacenamiento.obtener('Usuarios','email'),
-        this.servicioAlmacenamiento.obtener('Usuarios','password'),
-        this.servicioAlmacenamiento.obtener('Usuarios','rememberMe')
-      ]);
-  
-      // Validacion de las credenciales, Retornar true para indicar que son validas, en caso contrario da false
-      if (this.validarEmail(emailAlmacenado) && this.validarPassword(passwordAlmacenado) && recordar) {
-        this.email = emailAlmacenado;
-        this.password = passwordAlmacenado;
-        this.rememberMe = recordar;
-        return true;
+      // Obtenemos el email que el usuario introduce
+      const emailAlmacenado = this.email;
+
+      if (!emailAlmacenado) {
+        console.log('El email no está ingresado aún.');
+        return false;
       }
-      return false;
-  
-    } catch (error) { //en caso de cualquier error, se muestra en consola y ademas retorna false
+
+      // Intentar obtener el documento del usuario con base en el email
+      const usuario = await this.FirestoreService.getDocumentByEmail('Usuarios', emailAlmacenado);
+
+      if (usuario) {
+        console.log('Usuario encontrado:', usuario);
+
+        // Validación de las credenciales
+        if (this.validarEmail(usuario.email) && this.validarPassword(usuario.password)) {
+          this.email = usuario.email;
+          this.password = usuario.password;
+          this.rememberMe = usuario.rememberMe;
+          console.log('Credenciales válidas, iniciando sesión...');
+          return true;
+        } else {
+          console.log('Credenciales inválidas');
+          return false;
+        }
+      } else {
+        console.log('No se encontró el usuario');
+        return false;
+      }
+
+    } catch (error) {
       console.error('Error al cargar las credenciales:', error);
       return false;
     }
   }
-  
-  // Método asincrónico para iniciar sesión
+
   async iniciarSesion(autologin = false) {
     let loading: HTMLIonLoadingElement | null = null;
-
+  
     try {
-      // Si NO estuvo marcado el autologin, se presenta el loading con un mensajito
       if (!autologin) {
         loading = await this.loadingController.create({
-          message: 'Iniciando sesión...', // Mensaje para el usuario
+          message: 'Iniciando sesión...',
           duration: 3000,
         });
         await loading.present();
       }
-
-      // Realizar la validación solo si no es autologin
+  
+      // Validar email y password solo si no es autologin
       if (!autologin) {
         this.emailInvalid = !this.validarEmail(this.email);
         this.passwordInvalid = !this.validarPassword(this.password);
-
-        // Si hay errores en el email o la contraseña, cerrar el loading y mostrar el mensaje de error
+  
         if (this.emailInvalid || this.passwordInvalid) {
-          if (loading) {
-            await loading.dismiss(); // Cerrar el mensaje "Iniciando sesión..."
-          }
+          if (loading) await loading.dismiss();
           this.mostrarMensajeError('Por favor, revisa tu correo y contraseña.');
           return;
         }
       }
-
-      // Usar AuthService para verificar las credenciales
+  
+      // Llama a AuthService para verificar las credenciales
       const loginExitoso = await this.authService.login(this.email, this.password);
-
+  
       if (loginExitoso) {
         await this.gestionarCredenciales();
-        if (loading) {
-          await loading.dismiss();
-        }
+        if (loading) await loading.dismiss();
         this.router.navigate(['/tab/home']);
       } else {
-        if (loading) {
-          await loading.dismiss();
-        }
+        if (loading) await loading.dismiss();
         this.mostrarMensajeError('Credenciales incorrectas. Intenta de nuevo.');
       }
-
+  
     } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-      if (loading) {
-        await loading.dismiss();
-      }
+      console.error('Error durante el proceso de inicio de sesión:', error);
+      if (loading) await loading.dismiss();
       this.mostrarMensajeError('Ocurrió un error al intentar iniciar sesión.');
     }
-  }
+  }  
 
   // Método para gestionar las credenciales
   private async gestionarCredenciales() {

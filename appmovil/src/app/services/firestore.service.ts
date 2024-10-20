@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { collectionData, Firestore, doc, getDoc, deleteDoc, setDoc } from '@angular/fire/firestore';
+import { collectionData, Firestore, doc, getDoc, getDocs, deleteDoc, setDoc, query, where } from '@angular/fire/firestore';
 import { collection } from 'firebase/firestore';
 import { Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid'; 
@@ -62,6 +62,27 @@ export class FirestoreService {
       }
     } catch (error) {
       console.error(`Error al obtener documento con ID ${idDoc} de Firestore`, error);
+      throw error;
+    }
+  }
+
+  // Método en FirestoreService para obtener un documento por el campo email
+  async getDocumentByEmail(enlace: string, email: string): Promise<any> {
+    try {
+      console.log(`Buscando documento con email: ${email}`);
+      const q = query(collection(this.firestore, enlace), where('email', '==', email));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const doc = querySnapshot.docs[0]; // Suponiendo que solo hay un documento por email
+        console.log(`Documento encontrado: ${doc.data()}`);
+        return doc.data(); // Devuelve los datos del documento
+      } else {
+        console.log(`No se encontró ningún documento con el email: ${email}`);
+        throw new Error(`No se encontró ningún documento con el email: ${email}`);
+      }
+    } catch (error) {
+      console.error(`Error al obtener documento con email ${email} de Firestore`, error);
       throw error;
     }
   }

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { FirestoreService } from './firestore.service'; 
 import { ServicioAlmacenamiento } from './storage.service';
 
 @Injectable({
@@ -8,24 +9,30 @@ import { ServicioAlmacenamiento } from './storage.service';
 export class AuthService {
   private estaAutenticado: boolean = false;
 
-  constructor(private router: Router, private servicioAlmacenamiento: ServicioAlmacenamiento) {}
+  constructor(private router: Router, private firestoreService: FirestoreService, private servicioAlmacenamiento: ServicioAlmacenamiento) {}
 
   // Método para iniciar sesión
-  login(email: string, password: string): boolean {
-
-      // Simulación de usuarios (despues se usará la base de datos real, solo para pruebas)
-    const users = [
-      { email: 'pirulin@duro.com', password: '123123' },
-    ];
-
-    const user = users.find(user => user.email === email && user.password === password);
-    if (user) {
-      this.estaAutenticado = true;
-      return true; // Inicio de sesión exitoso
+  async login(email: string, password: string): Promise<boolean> {
+    try {
+      console.log(`Intentando iniciar sesión con email: ${email}`);
+      
+      // Busca el usuario directamente por email
+      const user = await this.firestoreService.getDocumentByEmail('Usuarios', email);
+      
+      if (user && user.password === password) {
+        console.log('Usuario encontrado. Inicio de sesión exitoso');
+        this.estaAutenticado = true;
+        return true;
+      } else {
+        console.log('Usuario no encontrado o credenciales incorrectas');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error durante el inicio de sesión:', error);
+      return false;
     }
-    return false; // Credenciales incorrectas
   }
-
+  
   // Método para salir (no implementado aun)
   async logout() {
     this.estaAutenticado = false;
