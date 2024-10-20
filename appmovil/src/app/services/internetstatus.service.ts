@@ -17,6 +17,7 @@ export class InternetstatusService {
     try {
       const status = await Network.getStatus();
       this.isOnline = status.connected;
+      console.log(`Estado inicial de conexión: ${this.isOnline}`);
     } catch (error) {
       console.error('Error al verificar el estado inicial de la conexión a internet:', error);
     }
@@ -26,12 +27,13 @@ export class InternetstatusService {
   listenerCambiosInternet() {
     Network.addListener('networkStatusChange', (status) => {
       this.isOnline = status.connected;
-      console.log('Estado de la red: ', this.isOnline ? 'En línea' : 'Sin conexión');
+      console.log('Estado de la red cambiado: ', this.isOnline ? 'En línea' : 'Sin conexión');
     });
   }
 
   // Método para verificar el estado actual
   estaConectado(): boolean {
+    console.log(`Estado de conexión verificado: ${this.isOnline}`);
     return this.isOnline;
   }
 }

@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { ServicioAlmacenamiento } from '../../services/storage.service';
 import { FirestoreService } from 'src/app/services/firestore.service';
-import { AuthService } from '../../services/auth.service'; // servicio de autentificacion
+import { AuthService } from '../../services/auth.service';
+import { InternetstatusService } from '../../services/internetstatus.service';
 import { ToastController } from '@ionic/angular';
 
 @Component({
@@ -26,7 +27,8 @@ export class LoginPage {
     private servicioAlmacenamiento: ServicioAlmacenamiento,
     private FirestoreService: FirestoreService,
     private authService: AuthService,
-    private toastController: ToastController 
+    private toastController: ToastController,
+    private internetstatusService: InternetstatusService 
   ) {
     this.servicioAlmacenamiento.inicializar();
   }
@@ -84,6 +86,19 @@ export class LoginPage {
     }
   }
 
+  // Método para gestionar las credenciales
+  private async gestionarCredenciales() {
+    if (this.rememberMe) {
+      await this.servicioAlmacenamiento.establecer('Usuarios','email', this.email);
+      await this.servicioAlmacenamiento.establecer('Usuarios','password', this.password);
+      await this.servicioAlmacenamiento.establecer('Usuarios','rememberMe', this.rememberMe);
+    } else {
+      await this.servicioAlmacenamiento.eliminar('Usuarios','email');
+      await this.servicioAlmacenamiento.eliminar('Usuarios','password');
+      await this.servicioAlmacenamiento.eliminar('Usuarios','rememberMe');
+    }
+  }
+
   async iniciarSesion(autologin = false) {
     let loading: HTMLIonLoadingElement | null = null;
   
@@ -103,19 +118,32 @@ export class LoginPage {
   
         if (this.emailInvalid || this.passwordInvalid) {
           if (loading) await loading.dismiss();
+          console.log('Email o contraseña inválidos:', { emailInvalid: this.emailInvalid, passwordInvalid: this.passwordInvalid });
           this.mostrarMensajeError('Por favor, revisa tu correo y contraseña.');
           return;
         }
+      }
+  
+      console.log('Intentando iniciar sesión con email:', this.email);
+    
+      // Comprobar si hay conexión antes de proceder al inicio de sesión
+      const estaConectado = this.internetstatusService.estaConectado();
+      console.log(`Estado de conexión antes de iniciar sesión: ${estaConectado}`);
+  
+      if (!estaConectado) {
+        this.mostrarMensajeError('No hay conexión a internet. Iniciando sesión con datos locales...');
       }
   
       // Llama a AuthService para verificar las credenciales
       const loginExitoso = await this.authService.login(this.email, this.password);
   
       if (loginExitoso) {
+        console.log('Login exitoso');
         await this.gestionarCredenciales();
         if (loading) await loading.dismiss();
         this.router.navigate(['/tab/home']);
       } else {
+        console.log('Login fallido');
         if (loading) await loading.dismiss();
         this.mostrarMensajeError('Credenciales incorrectas. Intenta de nuevo.');
       }
@@ -125,20 +153,8 @@ export class LoginPage {
       if (loading) await loading.dismiss();
       this.mostrarMensajeError('Ocurrió un error al intentar iniciar sesión.');
     }
-  }  
-
-  // Método para gestionar las credenciales
-  private async gestionarCredenciales() {
-    if (this.rememberMe) {
-      await this.servicioAlmacenamiento.establecer('Usuarios','email', this.email);
-      await this.servicioAlmacenamiento.establecer('Usuarios','password', this.password);
-      await this.servicioAlmacenamiento.establecer('Usuarios','rememberMe', this.rememberMe);
-    } else {
-      await this.servicioAlmacenamiento.eliminar('Usuarios','email');
-      await this.servicioAlmacenamiento.eliminar('Usuarios','password');
-      await this.servicioAlmacenamiento.eliminar('Usuarios','rememberMe');
-    }
   }
+  
 
   // Método para mostrar mensajes de error en el UI
   private async mostrarMensajeError(mensaje: string) {
