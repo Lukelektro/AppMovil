@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { InternetstatusService } from './internetstatus.service';
 import { FirestoreService } from './firestore.service'; 
 import { ServicioAlmacenamiento } from './storage.service';
+import { SesionService } from './sesion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,53 +16,67 @@ export class AuthService {
     private router: Router, 
     private firestoreService: FirestoreService, 
     private servicioAlmacenamiento: ServicioAlmacenamiento,
-    private internetstatusService: InternetstatusService
+    private internetstatusService: InternetstatusService,
+    private sesionService: SesionService
   ) {}
 
-  async login(email: string, password: string): Promise<boolean> {
-    try {
-      console.log(`Intentando iniciar sesión con email: ${email}`);
+  // Método de inicio de sesión en auth.service.ts
+  // Método de inicio de sesión en auth.service.ts
+async login(email: string, password: string, rememberMe: boolean): Promise<boolean> {
+  try {
+    console.log(`Intentando iniciar sesión con email: ${email}`);
+    
+    // Verificar si hay conexión a internet
+    if (this.internetstatusService.estaConectado()) {
+      console.log('Conexión a internet detectada, autenticando con Firebase');
+      
+      // Obtener el usuario por email
+      const user = await this.firestoreService.getDocumentByEmail('Usuarios', email);
   
-      // Verificar si hay conexión a internet
-      if (this.internetstatusService.estaConectado()) {
-        console.log('Conexión a internet detectada, autenticando con Firebase');
-        
-        // Utilizar el método que ya tienes para obtener el documento por email
-        const user = await this.firestoreService.getDocumentByEmail('Usuarios', email);
-  
-        if (user && user.password === password) {
-          console.log('Usuario autenticado en Firebase');
-          this.estaAutenticado = true;
-          this.emailAutenticado = email;
-          return true;
+      if (user && user.password === password) {
+        console.log('Usuario autenticado en Firebase');
+        this.estaAutenticado = true;
+        this.emailAutenticado = email;
+
+        // Comprobar si ya hay una sesión activa para este usuario
+        const sesionActiva = await this.sesionService.getSesionActiva(user.id);
+        if (sesionActiva) {
+          console.log('Ya existe una sesión activa para este usuario.');
         } else {
-          console.log('Credenciales incorrectas en Firebase');
-          return false;
+          // Crear una nueva sesión solo si no hay una activa
+          await this.sesionService.crearSesion(user.id, rememberMe);
         }
+
+        return true;
       } else {
-        console.log('Sin conexión a internet, autenticando con almacenamiento local');
-        
-        // Si no hay conexión, verifica en el almacenamiento local
-        const emailAlmacenado = await this.servicioAlmacenamiento.obtener('Usuarios', 'email');
-        const passwordAlmacenado = await this.servicioAlmacenamiento.obtener('Usuarios', 'password');
-        
-        if (emailAlmacenado === email && passwordAlmacenado === password) {
-          console.log('Usuario autenticado en almacenamiento local');
-          this.estaAutenticado = true;
-          this.emailAutenticado = email;  // Guardar el email autenticado
-          return true;
-        } else {
-          console.log('Credenciales incorrectas en almacenamiento local');
-          return false;
-        }
+        console.log('Credenciales incorrectas en Firebase');
+        return false;
       }
-    } catch (error) {
-      console.error('Error durante el inicio de sesión:', error);
-      return false;  // Error durante la validación
+    } else {
+      console.log('Sin conexión a internet, autenticando con almacenamiento local');
+      
+      const emailAlmacenado = await this.servicioAlmacenamiento.obtener('Usuarios', 'email');
+      const passwordAlmacenado = await this.servicioAlmacenamiento.obtener('Usuarios', 'password');
+      
+      if (emailAlmacenado === email && passwordAlmacenado === password) {
+        console.log('Usuario autenticado en almacenamiento local');
+        this.estaAutenticado = true;
+        this.emailAutenticado = email;
+        return true;
+      } else {
+        console.log('Credenciales incorrectas en almacenamiento local');
+        return false;
+      }
     }
+  } catch (error) {
+    console.error('Error durante el inicio de sesión:', error);
+    return false;
   }
-  
-  // Método para salir (no implementado aun)
+}
+
+
+
+  // Método para salir (logout)
   async logout() {
     this.estaAutenticado = false;
 
@@ -78,7 +93,6 @@ export class AuthService {
 
   // Método para obtener el email del usuario autenticado
   getAuthenticatedEmail(): string {
-    return this.emailAutenticado;  // Retorna el email autenticado
+    return this.emailAutenticado;
   }
 }
-

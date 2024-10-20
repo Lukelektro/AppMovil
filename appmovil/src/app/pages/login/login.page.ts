@@ -4,6 +4,7 @@ import { LoadingController } from '@ionic/angular';
 import { ServicioAlmacenamiento } from '../../services/storage.service';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { AuthService } from '../../services/auth.service';
+import { SesionService } from '../../services/sesion.service';  // Importa el SesionService
 import { InternetstatusService } from '../../services/internetstatus.service';
 import { ToastController } from '@ionic/angular';
 
@@ -17,85 +18,45 @@ export class LoginPage {
   passwordIcon: string = 'eye-off';
   email: string = '';
   password: string = '';
-  rememberMe: boolean = false;
   emailInvalid = false;
   passwordInvalid = false;
+  rememberMe: boolean = false;
 
   constructor(
     private router: Router,
     private loadingController: LoadingController,
     private servicioAlmacenamiento: ServicioAlmacenamiento,
-    private FirestoreService: FirestoreService,
+    private firestoreService: FirestoreService,
     private authService: AuthService,
+    private sesionService: SesionService,  // Inyecta el servicio de sesión
     private toastController: ToastController,
-    private internetstatusService: InternetstatusService 
+    private internetstatusService: InternetstatusService
   ) {
     this.servicioAlmacenamiento.inicializar();
   }
 
-  // mejore el metodo ngOnInit para que cargue las credenciales y haga el autologin mas rapido y eficiente
   async ngOnInit() {
     try {
-      const credencialesCargadas = await this.cargarCredenciales();
+      const emailAlmacenado = await this.servicioAlmacenamiento.obtener('Usuarios', 'email');
+      const passwordAlmacenado = await this.servicioAlmacenamiento.obtener('Usuarios', 'password');
+      
+      console.log('Credenciales almacenadas:', { emailAlmacenado, passwordAlmacenado });
+      
+      if (emailAlmacenado && passwordAlmacenado) {
+        this.email = emailAlmacenado;
+        this.password = passwordAlmacenado;
+        
+        const rememberMeAlmacenado = await this.servicioAlmacenamiento.obtener('Usuarios', 'rememberMe');
+        console.log('Estado de rememberMe:', rememberMeAlmacenado);
   
-      // Si las credenciales están cargadas y "Recordar" está activado, iniciar sesión directamente
-      if (credencialesCargadas) {
-        await this.iniciarSesion(true); // Autologin sin usar setTimeout
-      }
-    } catch (error) {
-      console.error('Error durante la inicialización:', error);
-    }
-  }
-
-  // Método asincrónico para cargar las credenciales desde Firebase
-  async cargarCredenciales(): Promise<boolean> {
-    try {
-      // Obtenemos el email que el usuario introduce
-      const emailAlmacenado = this.email;
-
-      if (!emailAlmacenado) {
-        console.log('El email no está ingresado aún.');
-        return false;
-      }
-
-      // Intentar obtener el documento del usuario con base en el email
-      const usuario = await this.FirestoreService.getDocumentByEmail('Usuarios', emailAlmacenado);
-
-      if (usuario) {
-        console.log('Usuario encontrado:', usuario);
-
-        // Validación de las credenciales
-        if (this.validarEmail(usuario.email) && this.validarPassword(usuario.password)) {
-          this.email = usuario.email;
-          this.password = usuario.password;
-          this.rememberMe = usuario.rememberMe;
-          console.log('Credenciales válidas, iniciando sesión...');
-          return true;
-        } else {
-          console.log('Credenciales inválidas');
-          return false;
+        if (rememberMeAlmacenado) {
+          this.rememberMe = true;
+          console.log("Intentando iniciar sesión automáticamente...");
+          await this.iniciarSesion(true);
         }
-      } else {
-        console.log('No se encontró el usuario');
-        return false;
       }
-
     } catch (error) {
-      console.error('Error al cargar las credenciales:', error);
-      return false;
-    }
-  }
-
-  // Método para gestionar las credenciales
-  private async gestionarCredenciales() {
-    if (this.rememberMe) {
-      await this.servicioAlmacenamiento.establecer('Usuarios','email', this.email);
-      await this.servicioAlmacenamiento.establecer('Usuarios','password', this.password);
-      await this.servicioAlmacenamiento.establecer('Usuarios','rememberMe', this.rememberMe);
-    } else {
-      await this.servicioAlmacenamiento.eliminar('Usuarios','email');
-      await this.servicioAlmacenamiento.eliminar('Usuarios','password');
-      await this.servicioAlmacenamiento.eliminar('Usuarios','rememberMe');
+      console.error('Error durante la carga de credenciales almacenadas:', error);
     }
   }
 
@@ -118,32 +79,20 @@ export class LoginPage {
   
         if (this.emailInvalid || this.passwordInvalid) {
           if (loading) await loading.dismiss();
-          console.log('Email o contraseña inválidos:', { emailInvalid: this.emailInvalid, passwordInvalid: this.passwordInvalid });
           this.mostrarMensajeError('Por favor, revisa tu correo y contraseña.');
           return;
         }
       }
   
-      console.log('Intentando iniciar sesión con email:', this.email);
-    
-      // Comprobar si hay conexión antes de proceder al inicio de sesión
-      const estaConectado = this.internetstatusService.estaConectado();
-      console.log(`Estado de conexión antes de iniciar sesión: ${estaConectado}`);
-  
-      if (!estaConectado) {
-        this.mostrarMensajeError('No hay conexión a internet. Iniciando sesión con datos locales...');
-      }
-  
-      // Llama a AuthService para verificar las credenciales
-      const loginExitoso = await this.authService.login(this.email, this.password);
+      // Aquí pasamos el valor correcto de rememberMe al servicio de autenticación
+      const loginExitoso = await this.authService.login(this.email, this.password, this.rememberMe);
   
       if (loginExitoso) {
         console.log('Login exitoso');
-        await this.gestionarCredenciales();
+        await this.gestionarCredenciales();  // Gestionar credenciales locales si rememberMe está activado
         if (loading) await loading.dismiss();
         this.router.navigate(['/tab/home']);
       } else {
-        console.log('Login fallido');
         if (loading) await loading.dismiss();
         this.mostrarMensajeError('Credenciales incorrectas. Intenta de nuevo.');
       }
@@ -155,8 +104,20 @@ export class LoginPage {
     }
   }
   
+  
 
-  // Método para mostrar mensajes de error en el UI
+  private async gestionarCredenciales() {
+    if (this.rememberMe) {
+      await this.servicioAlmacenamiento.establecer('Usuarios', 'email', this.email);
+      await this.servicioAlmacenamiento.establecer('Usuarios', 'password', this.password);
+      await this.servicioAlmacenamiento.establecer('Usuarios', 'rememberMe', true);  // Guardamos también el estado del checkbox
+    } else {
+      await this.servicioAlmacenamiento.eliminar('Usuarios', 'email');
+      await this.servicioAlmacenamiento.eliminar('Usuarios', 'password');
+      await this.servicioAlmacenamiento.eliminar('Usuarios', 'rememberMe');  // Eliminamos el estado del checkbox si no se quiere recordar
+    }
+  }
+  
   private async mostrarMensajeError(mensaje: string) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -166,12 +127,10 @@ export class LoginPage {
     await toast.present();
   }
 
-  // Metodo para mostrar u ocultar la contraseña
   mostrarPassword() {
     this.passwordType = this.passwordType === 'password' ? 'text' : 'password';
     this.passwordIcon = this.passwordIcon === 'eye-off' ? 'eye' : 'eye-off';
   }
-
 
   validarEmail(email: string): boolean {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -181,4 +140,10 @@ export class LoginPage {
   validarPassword(password: string): boolean {
     return password.length >= 6;
   }
+
+  onRememberMeToggle(event: any) {
+    this.rememberMe = event.detail.checked;
+    console.log('RememberMe activado:', this.rememberMe);
+  }
+  
 }

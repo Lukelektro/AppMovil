@@ -5,5 +5,4 @@ export interface Usuario {
     password: string;
     telefono: string;
     direccion: string;
-    rememberMe: boolean;
 }

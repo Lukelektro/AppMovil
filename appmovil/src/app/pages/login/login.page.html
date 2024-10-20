@@ -38,8 +38,8 @@
             </ion-item>
             <ion-item>
               <ion-label>Recuérdame</ion-label>
-              <ion-checkbox [(ngModel)]="rememberMe" name="rememberMe"></ion-checkbox>
-            </ion-item>          
+                <ion-checkbox [checked]="rememberMe" (ionChange)="onRememberMeToggle($event)"></ion-checkbox>
+            </ion-item>                      
           </ion-list>
 
           <div class="center-container">

@@ -4,8 +4,6 @@ import { collection } from 'firebase/firestore';
 import { Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid'; 
 
-//acostumbrate a utilizar metodo try-catch cabezon del miembro
-
 @Injectable({
   providedIn: 'root'
 })
@@ -41,6 +39,9 @@ export class FirestoreService {
   // Método CREATE para crear un documento con ID específico
   async createDocumentID(data: any, enlace: string, idDoc: string): Promise<void> {
     try {
+      if (typeof data !== 'object' || data === null) {
+        throw new Error('Los datos para el documento deben ser un objeto válido.');
+      }
       const document = doc(this.firestore, `${enlace}/${idDoc}`);
       await setDoc(document, data);
       console.log(`Documento con ID ${idDoc} creado en Firestore en la ruta: ${enlace}`);
@@ -50,7 +51,7 @@ export class FirestoreService {
     }
   }
 
-    // Método para obtener un documento por su ID
+  // Método para obtener un documento por su ID
   async getDocumentById(enlace: string, idDoc: string): Promise<any> {
     try {
       const documentRef = doc(this.firestore, `${enlace}/${idDoc}`);
@@ -66,7 +67,19 @@ export class FirestoreService {
     }
   }
 
-  // Método en FirestoreService para obtener un documento por el campo email
+  // Método para actualizar los datos del perfil en Firestore sin cambiar el ID
+  async updateDocumentById(enlace: string, idDoc: string, data: any): Promise<void> {
+    try {
+      const documentRef = doc(this.firestore, `${enlace}/${idDoc}`);
+      await setDoc(documentRef, data, { merge: true });  // Utiliza merge para actualizar solo campos específicos
+      console.log(`Documento con ID ${idDoc} actualizado en Firestore en la ruta: ${enlace}`);
+    } catch (error) {
+      console.error(`Error al actualizar el documento con ID ${idDoc} en la ruta: ${enlace}`, error);
+      throw new Error(`No se pudo actualizar el documento con ID ${idDoc} en la ruta: ${enlace}`);
+    }
+  }
+
+  // Método para obtener un documento por el campo email
   async getDocumentByEmail(enlace: string, email: string): Promise<any> {
     try {
       console.log(`Buscando documento con email: ${email}`);
@@ -84,6 +97,26 @@ export class FirestoreService {
     } catch (error) {
       console.error(`Error al obtener documento con email ${email} de Firestore`, error);
       throw error;
+    }
+  }
+
+  // Método para obtener documentos por un query específico
+  async getItemsByQuery(enlace: string, campo: string, operador: string, valor: any): Promise<any[]> {
+    try {
+      const coleccionRef = collection(this.firestore, enlace);  // Enlace a la colección
+      const q = query(coleccionRef, where(campo, operador as any, valor));  // Creamos la query
+
+      const querySnapshot = await getDocs(q);  // Ejecutamos la query
+      const items: any[] = [];
+
+      querySnapshot.forEach((doc) => {
+        items.push(doc.data());  // Guardamos los resultados
+      });
+
+      return items;  // Retornamos los resultados
+    } catch (error) {
+      console.error(`Error al obtener elementos por query en la colección ${enlace}:`, error);
+      throw new Error('Error al obtener los elementos por query.');
     }
   }
 
@@ -109,5 +142,4 @@ export class FirestoreService {
       throw new Error('No se pudo generar un ID aleatorio');
     }
   }
-
 }

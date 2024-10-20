@@ -123,13 +123,35 @@ export class PerfilPage implements OnInit {
 
   guardarCambios() {
     if (this.formularioValido()) {
-      localStorage.setItem('perfil', JSON.stringify(this.perfil));
-      this.presentAlert();
-      console.log('Cambios guardados:', this.perfil);
+      const email = this.authService.getAuthenticatedEmail();
+      if (email) {
+        // Primero obtenemos el perfil actual usando el email
+        this.firestoreService.getDocumentByEmail('Usuarios', email)
+          .then((perfilActual) => {
+            if (perfilActual) {
+              const idDoc = perfilActual.id; // Mantén el ID del documento original
+  
+              // Ahora actualizamos el documento en Firestore con los nuevos datos
+              this.firestoreService.updateDocumentById('Usuarios', idDoc, this.perfil)
+                .then(() => {
+                  this.alertaExito();  // Mostrar alerta de éxito
+                  console.log('Cambios guardados en Firebase:', this.perfil);
+                })
+                .catch((error) => {
+                  console.error('Error al guardar los cambios en Firebase:', error);
+                });
+            }
+          })
+          .catch((error) => {
+            console.error('Error al obtener el perfil actual:', error);
+          });
+      }
     } else {
       console.log('El formulario contiene errores');
     }
   }
+  
+
 
   formularioValido(): boolean {
     const camposLlenos = Object.values(this.perfil).every(valor => valor !== '');
@@ -137,7 +159,7 @@ export class PerfilPage implements OnInit {
     return camposLlenos && sinErrores;
   }
 
-  async presentAlert() {
+  async alertaExito() {
     const alert = await this.alertController.create({
       header: 'Perfil Editado',
       message: 'Se ha editado su perfil correctamente',
