@@ -17,9 +17,63 @@ export class ServicioAlmacenamiento {
     this.inicializar(); // Se inicializa el almacenamiento
   }
 
+  // Inicializa Ionic Storage para el entorno web
+  private async inicializarIonicStorage() {
+    try {
+      if (!this._almacenamiento) {
+        const almacenamiento = await this.storage.create();
+        this._almacenamiento = almacenamiento;
+      }
+    } catch (error) {
+      console.error('Error al inicializar almacenamiento Ionic:', error);
+      throw new Error('No se pudo inicializar el almacenamiento local. (inicializarIonicStorage)');
+    }
+  }
+
+  // Inicializa SQLite para el entorno móvil
+  private async inicializarSQLite() {
+    try {
+      if (!this.dbSQLite) {
+        this.sqliteConnection = new SQLiteConnection(CapacitorSQLite);
+    
+        this.dbSQLite = await this.sqliteConnection.createConnection('dbPetshopFancy', false, 'no-encryption', 1, false);
+        await this.dbSQLite.open();
+        await this.crearTabla('entidad_generica');
+      } else {
+        console.warn('La conexión SQLite ya está activa.');
+      }
+    } catch (error) {
+      console.error('Error al inicializar SQLite: ', error);
+      throw new Error('No se pudo inicializar la conexión a SQLite. (inicializarSQLite)');
+    }
+  }
+
+  // Crear tabla en SQLite con estado de sincronización
+  private async crearTabla(entidad: string) {
+    try {
+      if (!this.dbSQLite) {
+        throw new Error('La conexión a la base de datos SQLite no está inicializada. (crearTabla)');
+      }
+  
+      const query = ` 
+        CREATE TABLE IF NOT EXISTS ${entidad} (
+          id TEXT PRIMARY KEY,
+          datos TEXT,
+          sincronizado INTEGER DEFAULT 0  -- 0 = no sincronizado, 1 = sincronizado
+        )
+      `;
+      console.log(`Ejecutando consulta para crear la tabla: ${entidad}`);
+      
+      await this.dbSQLite.execute(query);
+      console.log(`Tabla "${entidad}" creada o ya existe.`);
+      
+    } catch (error) {
+      console.error(`Error al crear la tabla ${entidad} en SQLite:`, error);
+      throw new Error(`No se pudo crear la tabla ${entidad} en SQLite. (crearTabla)`);
+    }
+  }
+
   // Método asincrónico para iniciar el almacenamiento local o SQLite, dependiendo del dispositivo
-  // utilice un if mucho mas especifico, porque quiero tener mas control, asi me ahorro dolores de cabeza
-  // igual puse por defecto el uso de SQLite.
   async inicializar() {
     try {
       const platform = Capacitor.getPlatform();
@@ -40,42 +94,7 @@ export class ServicioAlmacenamiento {
     }
   }
 
-  // Inicializa Ionic Storage para el entorno web
-  private async inicializarIonicStorage() {
-    try {
-      // Verificar si el almacenamiento ya ha sido inicializado
-      if (!this._almacenamiento) {
-        const almacenamiento = await this.storage.create();
-        this._almacenamiento = almacenamiento;
-      }
-    } catch (error) {
-      console.error('Error al inicializar almacenamiento Ionic:', error);
-      throw new Error('No se pudo inicializar el almacenamiento local. (inicializarIonicStorage)');
-    }
-  }
-  
-  // Inicializa SQLite para el entorno móvil
-  private async inicializarSQLite() {
-    try {
-      // Verificar si ya existe una conexión activa
-      if (!this.dbSQLite) {
-        this.sqliteConnection = new SQLiteConnection(CapacitorSQLite);
-    
-        this.dbSQLite = await this.sqliteConnection.createConnection('dbPetshopFancy', false, 'no-encryption', 1, false);
-
-        await this.dbSQLite.open();
-        await this.crearTabla();
-
-      } else {
-        console.warn('La conexión SQLite ya está activa.');
-      }
-    } catch (error) {
-      console.error('Error al inicializar SQLite: ', error);
-      throw new Error('No se pudo inicializar la conexión a SQLite. (inicializarSQLite)');
-    }
-  }
-
-  // Asegura que el almacenamiento esté inicializado, según la plataforma utilizada
+  // Asegura que el almacenamiento esté inicializado
   private async asegurarAlmacenamientoInicializado(): Promise<void> {
     try {
       if (this.usandoSQL) {
@@ -101,33 +120,8 @@ export class ServicioAlmacenamiento {
     }
   }
 
-
-  // Crear tabla en SQLite si no existe
-  private async crearTabla() {
-    try {
-      if (!this.dbSQLite) {
-        throw new Error('La conexión a la base de datos SQLite no está inicializada. (crearTabla)');
-      }
-      // solo para testear, se utilizó esta query
-      const query = ` 
-        CREATE TABLE IF NOT EXISTS datos (
-          clave TEXT PRIMARY KEY,
-          valor TEXT
-        )
-      `;
-      console.log('Ejecutando consulta para crear tabla:', query);
-      
-      await this.dbSQLite.execute(query);
-      console.log('Tabla "datos" creada o ya existe.');
-      
-    } catch (error) {
-      console.error('Error al crear la tabla en SQLite:', error);
-      throw new Error('No se pudo crear la tabla en SQLite. (crearTabla)');
-    }
-  }
-
   // Guardar un valor en el almacenamiento
-  public async establecer(key: string, value: any): Promise<void> {
+  public async establecer(entidad: string, key: string, value: any): Promise<void> {
     await this.asegurarAlmacenamientoInicializado();
 
     try {
@@ -140,7 +134,8 @@ export class ServicioAlmacenamiento {
       }
 
       if (this.usandoSQL && this.dbSQLite) {
-        const query = `INSERT OR REPLACE INTO datos (clave, valor) VALUES (?, ?)`;
+        // Marcar el registro como no sincronizado (sincronizado = 0)
+        const query = `INSERT OR REPLACE INTO ${entidad} (id, datos, sincronizado) VALUES (?, ?, 0)`;
         await this.dbSQLite.run(query, [key, JSON.stringify(value)]);
       } else if (this._almacenamiento) {
         await this._almacenamiento.set(key, value);
@@ -151,9 +146,8 @@ export class ServicioAlmacenamiento {
     }
   }
 
-
   // Obtener un valor del almacenamiento
-  public async obtener(key: string): Promise<any> {
+  public async obtener(entidad: string, key: string): Promise<any> {
     await this.asegurarAlmacenamientoInicializado();
 
     try {
@@ -162,11 +156,11 @@ export class ServicioAlmacenamiento {
       }
 
       if (this.usandoSQL && this.dbSQLite) {
-        const query = `SELECT valor FROM datos WHERE clave = ?`;
+        const query = `SELECT datos FROM ${entidad} WHERE id = ?`;
         const result = await this.dbSQLite.query(query, [key]);
 
         if (result && result.values && result.values.length > 0) {
-          return JSON.parse(result.values[0].valor);
+          return JSON.parse(result.values[0].datos);
         } else {
           console.log(`No se encontraron datos para la clave: ${key}`);
           return null;
@@ -181,6 +175,7 @@ export class ServicioAlmacenamiento {
 
     return null;
   }
+
 
 
   // Eliminar un valor del almacenamiento

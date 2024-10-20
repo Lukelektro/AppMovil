@@ -13,28 +13,51 @@ export class FirestoreService {
 
   constructor() { }
 
-  //metodo READ generico para colecciones de la firestore
-  getItemsChanges<tipo>(path: string) { 
-    const itemCollection = collection(this.firestore, path)
-    return collectionData(itemCollection) as Observable<tipo[]>;
+  // Método READ genérico para colecciones de Firestore
+  getItemsChanges<tipo>(path: string): Observable<tipo[]> {
+    try {
+      const itemCollection = collection(this.firestore, path);
+      return collectionData(itemCollection) as Observable<tipo[]>;
+    } catch (error) {
+      console.error(`Error al obtener datos de la colección: ${path}`, error);
+      throw new Error(`No se pudo obtener los datos de la colección: ${path}`);
+    }
   }
 
-  //metodo CREATE para crear un documento
-  createDocument(data: any, enlace: string) {
-    const document = doc(this.firestore,enlace);
-    return setDoc(document, data);
+  // Método CREATE para crear un documento sin ID específico
+  async createDocument(data: any, enlace: string): Promise<void> {
+    try {
+      const document = doc(this.firestore, enlace);
+      await setDoc(document, data);
+      console.log(`Documento creado en Firestore en la ruta: ${enlace}`);
+    } catch (error) {
+      console.error(`Error al crear el documento en la ruta: ${enlace}`, error);
+      throw new Error(`No se pudo crear el documento en la ruta: ${enlace}`);
+    }
   }
 
-   //metodo CREATE para crear un documento con id
-  createDocumentID(data: any, enlace: string, idDoc: string) {
-    const document = doc(this.firestore, `${enlace}/${idDoc}`);
-    return setDoc(document, data);
+  // Método CREATE para crear un documento con ID específico
+  async createDocumentID(data: any, enlace: string, idDoc: string): Promise<void> {
+    try {
+      const document = doc(this.firestore, `${enlace}/${idDoc}`);
+      await setDoc(document, data);
+      console.log(`Documento con ID ${idDoc} creado en Firestore en la ruta: ${enlace}`);
+    } catch (error) {
+      console.error(`Error al crear el documento con ID ${idDoc} en la ruta: ${enlace}`, error);
+      throw new Error(`No se pudo crear el documento con ID ${idDoc} en la ruta: ${enlace}`);
+    }
   }
 
-  //metodo para id aleatorio
-
-  createIdDoc() {
-    return uuidv4()
+  // Método para generar un ID único aleatorio
+  createIdDoc(): string {
+    try {
+      const id = uuidv4();
+      console.log(`ID aleatorio generado: ${id}`);
+      return id;
+    } catch (error) {
+      console.error('Error al generar un ID aleatorio', error);
+      throw new Error('No se pudo generar un ID aleatorio');
+    }
   }
 
 }
