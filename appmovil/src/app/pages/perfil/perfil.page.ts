@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular'; // Importar LoadingController
 import { AuthService } from '../../services/auth.service';  // Importar AuthService
-import { FirestoreService } from '../../services/firestore.service'; // Importar FirestoreService
+import { FirestoreService } from 'src/app/services/firestore.service'; // Importar FirestoreService
 
 @Component({
   selector: 'app-perfil',
@@ -9,12 +9,6 @@ import { FirestoreService } from '../../services/firestore.service'; // Importar
   styleUrls: ['./perfil.page.scss'],
 })
 export class PerfilPage implements OnInit {
-
-  constructor(
-    private alertController: AlertController, 
-    private authService: AuthService,
-    private firestoreService: FirestoreService // Inyectar FirestoreService
-  ) {}
 
   perfil: any = {
     nombre: '',
@@ -32,27 +26,49 @@ export class PerfilPage implements OnInit {
     direccion: ''
   };
 
-  ngOnInit() {
-    this.cargarPerfil();
+  constructor(
+    private alertController: AlertController, 
+    private authService: AuthService,
+    private firestoreService: FirestoreService,
+    private loadingController: LoadingController  
+  ) {}
+
+  async ngOnInit() {
+    await this.mostrarLoading();
+    await this.cargarPerfil();
   }
 
-  async cargarPerfil() {
-    try {
-      // Obtener el email del usuario autenticado
-      const emailAutenticado = this.authService.getAuthenticatedEmail();
-      console.log(`Cargando perfil para el email autenticado: ${emailAutenticado}`);
+  // Mostrar el loading spinner
+  async mostrarLoading() {
+    const loading = await this.loadingController.create({
+      message: 'Cargando perfil...',
+      spinner: 'circles',
+      duration: 3000
+    });
 
-      // Obtener el documento del perfil desde Firestore
+    await loading.present();
+  }
+
+  // Método para cargar el perfil
+  async cargarPerfil() {
+    const emailAutenticado = this.authService.getAuthenticatedEmail();
+    console.log(`Cargando perfil para el email autenticado: ${emailAutenticado}`);
+
+    try {
+      // Intentar cargar el perfil desde Firestore
       const usuario = await this.firestoreService.getDocumentByEmail('Usuarios', emailAutenticado);
 
       if (usuario) {
-        this.perfil = usuario;  // Cargar los datos en el objeto perfil
+        this.perfil = usuario;
         console.log('Perfil cargado:', this.perfil);
       } else {
         console.log('No se encontró el perfil.');
       }
     } catch (error) {
       console.error('Error al cargar el perfil:', error);
+    } finally {
+      // Ocultar el loading spinner
+      this.loadingController.dismiss();
     }
   }
 
@@ -62,6 +78,7 @@ export class PerfilPage implements OnInit {
     this.validarCampo(campo, valor);
   }
 
+  // Validaciones de los campos
   validarCampo(campo: string, valor: string) {
     switch (campo) {
       case 'nombre':
