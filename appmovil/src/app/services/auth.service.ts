@@ -9,6 +9,7 @@ import { ServicioAlmacenamiento } from './storage.service';
 })
 export class AuthService {
   private estaAutenticado: boolean = false;
+  private emailAutenticado: string = '';
 
   constructor(
     private router: Router, 
@@ -31,6 +32,7 @@ export class AuthService {
         if (user && user.password === password) {
           console.log('Usuario autenticado en Firebase');
           this.estaAutenticado = true;
+          this.emailAutenticado = email;
           return true;
         } else {
           console.log('Credenciales incorrectas en Firebase');
@@ -46,6 +48,7 @@ export class AuthService {
         if (emailAlmacenado === email && passwordAlmacenado === password) {
           console.log('Usuario autenticado en almacenamiento local');
           this.estaAutenticado = true;
+          this.emailAutenticado = email;  // Guardar el email autenticado
           return true;
         } else {
           console.log('Credenciales incorrectas en almacenamiento local');
@@ -63,12 +66,7 @@ export class AuthService {
     this.estaAutenticado = false;
 
     // Eliminar las credenciales almacenadas cuando se cierre sesión
-    /* plantie en este caso, que el usuario final quien cierra sesion, no quiere realmente que se eliminen las credenciales
-    quizas esto es un error, pero es una idea que se me ocurrio, si se quiere que se eliminen las credenciales, descomentar las siguientes lineas
-    await this.servicioAlmacenamiento.eliminar('email');
-    await this.servicioAlmacenamiento.eliminar('password');
-    */
-    await this.servicioAlmacenamiento.eliminar('Usuarios','rememberMe');
+    await this.servicioAlmacenamiento.eliminar('Usuarios', 'rememberMe');
 
     this.router.navigate(['/login']);
   }
@@ -77,4 +75,10 @@ export class AuthService {
   estaLogeado(): boolean {
     return this.estaAutenticado;
   }
+
+  // Método para obtener el email del usuario autenticado
+  getAuthenticatedEmail(): string {
+    return this.emailAutenticado;  // Retorna el email autenticado
+  }
 }
+

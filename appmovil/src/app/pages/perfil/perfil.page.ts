@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { AuthService } from '../../services/auth.service';  // Importar AuthService
+import { FirestoreService } from '../../services/firestore.service'; // Importar FirestoreService
 
 @Component({
   selector: 'app-perfil',
@@ -9,7 +10,11 @@ import { AuthService } from '../../services/auth.service';  // Importar AuthServ
 })
 export class PerfilPage implements OnInit {
 
-  constructor(private alertController: AlertController, private authService: AuthService) {}  // Inyectar el servicio AuthService
+  constructor(
+    private alertController: AlertController, 
+    private authService: AuthService,
+    private firestoreService: FirestoreService // Inyectar FirestoreService
+  ) {}
 
   perfil: any = {
     nombre: '',
@@ -31,17 +36,23 @@ export class PerfilPage implements OnInit {
     this.cargarPerfil();
   }
 
-  cargarPerfil() {
-    const perfilGuardado = localStorage.getItem('perfil');
-    if (perfilGuardado) {
-      this.perfil = JSON.parse(perfilGuardado);
-    } else {
-      this.perfil = {
-        nombre: 'Martín López',
-        email: 'martin.lopez@ejemplo.com',
-        telefono: '+1234567890',
-        direccion: 'Calle Principal 123, Ciudad'
-      };
+  async cargarPerfil() {
+    try {
+      // Obtener el email del usuario autenticado
+      const emailAutenticado = this.authService.getAuthenticatedEmail();
+      console.log(`Cargando perfil para el email autenticado: ${emailAutenticado}`);
+
+      // Obtener el documento del perfil desde Firestore
+      const usuario = await this.firestoreService.getDocumentByEmail('Usuarios', emailAutenticado);
+
+      if (usuario) {
+        this.perfil = usuario;  // Cargar los datos en el objeto perfil
+        console.log('Perfil cargado:', this.perfil);
+      } else {
+        console.log('No se encontró el perfil.');
+      }
+    } catch (error) {
+      console.error('Error al cargar el perfil:', error);
     }
   }
 
