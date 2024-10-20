@@ -8,6 +8,7 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { ComponentsModule } from './components/components.module'; 
 import { IonicStorageModule } from '@ionic/storage-angular';
+import { HttpClientModule } from '@angular/common/http'; // Importa HttpClientModule
 
 //Firebase
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
@@ -15,8 +16,6 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getAnalytics, provideAnalytics, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
 import { environment } from 'src/environments/environment.prod';
-
-
 
 @NgModule({
   declarations: [AppComponent],
@@ -27,8 +26,8 @@ import { environment } from 'src/environments/environment.prod';
     ComponentsModule,
     ReactiveFormsModule,
     FormsModule,
-    IonicStorageModule.forRoot()
-
+    IonicStorageModule.forRoot(),
+    HttpClientModule, // Agrega HttpClientModule
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

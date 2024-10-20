@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import { TabPage } from './tab.page';
 
 const routes: Routes = [
@@ -17,9 +16,17 @@ const routes: Routes = [
         loadChildren: () => import('./../../pages/inventory/inventory.module').then( m => m.InventoryPageModule)
       },
       {
-        path: 'citas',
-        loadChildren: () => import('./../../pages/citas/citas.module').then( m => m.CitasPageModule)
+        path: 'menu-mas',
+        loadChildren: () => import('./../../pages/menu-mas/menu-mas.module').then( m => m.MenuMasPageModule)
       },
+      {
+        path : 'perfil',
+        loadChildren: () => import('./../../pages/perfil/perfil.module').then( m => m.PerfilPageModule)
+      },
+      {
+        path : 'catdog-api',
+        loadChildren: () => import('./../../pages/catdog-api/catdog-api.module').then( m => m.CatdogApiPageModule)
+      }
     ]
   }
 ];

@@ -1,42 +1,87 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { InternetstatusService } from './internetstatus.service';
+import { FirestoreService } from './firestore.service'; 
 import { ServicioAlmacenamiento } from './storage.service';
+import { SesionService } from './sesion.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private estaAutenticado: boolean = false;
+  private emailAutenticado: string = '';
 
-  constructor(private router: Router, private servicioAlmacenamiento: ServicioAlmacenamiento) {}
+  constructor(
+    private router: Router, 
+    private firestoreService: FirestoreService, 
+    private servicioAlmacenamiento: ServicioAlmacenamiento,
+    private internetstatusService: InternetstatusService,
+    private sesionService: SesionService
+  ) {}
 
-  // Método para iniciar sesión
-  login(email: string, password: string): boolean {
+  // Método de inicio de sesión en auth.service.ts
+  // Método de inicio de sesión en auth.service.ts
+async login(email: string, password: string, rememberMe: boolean): Promise<boolean> {
+  try {
+    console.log(`Intentando iniciar sesión con email: ${email}`);
+    
+    // Verificar si hay conexión a internet
+    if (this.internetstatusService.estaConectado()) {
+      console.log('Conexión a internet detectada, autenticando con Firebase');
+      
+      // Obtener el usuario por email
+      const user = await this.firestoreService.getDocumentByEmail('Usuarios', email);
+  
+      if (user && user.password === password) {
+        console.log('Usuario autenticado en Firebase');
+        this.estaAutenticado = true;
+        this.emailAutenticado = email;
 
-      // Simulación de usuarios (despues se usará la base de datos real, solo para pruebas)
-    const users = [
-      { email: 'pirulin@duro.com', password: '123123' },
-    ];
+        // Comprobar si ya hay una sesión activa para este usuario
+        const sesionActiva = await this.sesionService.getSesionActiva(user.id);
+        if (sesionActiva) {
+          console.log('Ya existe una sesión activa para este usuario.');
+        } else {
+          // Crear una nueva sesión solo si no hay una activa
+          await this.sesionService.crearSesion(user.id, rememberMe);
+        }
 
-    const user = users.find(user => user.email === email && user.password === password);
-    if (user) {
-      this.estaAutenticado = true;
-      return true; // Inicio de sesión exitoso
+        return true;
+      } else {
+        console.log('Credenciales incorrectas en Firebase');
+        return false;
+      }
+    } else {
+      console.log('Sin conexión a internet, autenticando con almacenamiento local');
+      
+      const emailAlmacenado = await this.servicioAlmacenamiento.obtener('Usuarios', 'email');
+      const passwordAlmacenado = await this.servicioAlmacenamiento.obtener('Usuarios', 'password');
+      
+      if (emailAlmacenado === email && passwordAlmacenado === password) {
+        console.log('Usuario autenticado en almacenamiento local');
+        this.estaAutenticado = true;
+        this.emailAutenticado = email;
+        return true;
+      } else {
+        console.log('Credenciales incorrectas en almacenamiento local');
+        return false;
+      }
     }
-    return false; // Credenciales incorrectas
+  } catch (error) {
+    console.error('Error durante el inicio de sesión:', error);
+    return false;
   }
+}
 
-  // Método para salir (no implementado aun)
+
+
+  // Método para salir (logout)
   async logout() {
     this.estaAutenticado = false;
 
     // Eliminar las credenciales almacenadas cuando se cierre sesión
-    /* plantie en este caso, que el usuario final quien cierra sesion, no quiere realmente que se eliminen las credenciales
-    quizas esto es un error, pero es una idea que se me ocurrio, si se quiere que se eliminen las credenciales, descomentar las siguientes lineas
-    await this.servicioAlmacenamiento.eliminar('email');
-    await this.servicioAlmacenamiento.eliminar('password');
-    */
-    await this.servicioAlmacenamiento.eliminar('rememberMe');
+    await this.servicioAlmacenamiento.eliminar('Usuarios', 'rememberMe');
 
     this.router.navigate(['/login']);
   }
@@ -44,5 +89,10 @@ export class AuthService {
   // Método para verificar si el usuario está autenticado
   estaLogeado(): boolean {
     return this.estaAutenticado;
+  }
+
+  // Método para obtener el email del usuario autenticado
+  getAuthenticatedEmail(): string {
+    return this.emailAutenticado;
   }
 }
