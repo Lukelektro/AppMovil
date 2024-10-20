@@ -2,7 +2,9 @@ import { inject, Injectable } from '@angular/core';
 import { collectionData, Firestore } from '@angular/fire/firestore';
 import { collection, doc, setDoc } from 'firebase/firestore';
 import { Observable } from 'rxjs';
-import { v4 as uuidv4 } from 'uuid';  
+import { v4 as uuidv4 } from 'uuid'; 
+
+//acostumbrate a utilizar metodo try-catch cabezon del miembro
 
 @Injectable({
   providedIn: 'root'
