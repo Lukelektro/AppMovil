@@ -48,9 +48,9 @@ export class LoginPage {
     try {
       // Hacer todas las llamadas de una vez para mejorar el rendimiento (gracias joaco))
       const [emailAlmacenado, passwordAlmacenado, recordar] = await Promise.all([
-        this.servicioAlmacenamiento.obtener('email'),
-        this.servicioAlmacenamiento.obtener('password'),
-        this.servicioAlmacenamiento.obtener('rememberMe')
+        this.servicioAlmacenamiento.obtener('Usuarios','email'),
+        this.servicioAlmacenamiento.obtener('Usuarios','password'),
+        this.servicioAlmacenamiento.obtener('Usuarios','rememberMe')
       ]);
   
       // Validacion de las credenciales, Retornar true para indicar que son validas, en caso contrario da false
@@ -125,13 +125,13 @@ export class LoginPage {
   // Método para gestionar las credenciales
   private async gestionarCredenciales() {
     if (this.rememberMe) {
-      await this.servicioAlmacenamiento.establecer('email', this.email);
-      await this.servicioAlmacenamiento.establecer('password', this.password);
-      await this.servicioAlmacenamiento.establecer('rememberMe', this.rememberMe);
+      await this.servicioAlmacenamiento.establecer('Usuarios','email', this.email);
+      await this.servicioAlmacenamiento.establecer('Usuarios','password', this.password);
+      await this.servicioAlmacenamiento.establecer('Usuarios','rememberMe', this.rememberMe);
     } else {
-      await this.servicioAlmacenamiento.eliminar('email');
-      await this.servicioAlmacenamiento.eliminar('password');
-      await this.servicioAlmacenamiento.eliminar('rememberMe');
+      await this.servicioAlmacenamiento.eliminar('Usuarios','email');
+      await this.servicioAlmacenamiento.eliminar('Usuarios','password');
+      await this.servicioAlmacenamiento.eliminar('Usuarios','rememberMe');
     }
   }
 

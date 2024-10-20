@@ -24,6 +24,7 @@ export class RegistroPage implements OnInit {
     password: null,
     telefono: null,
     direccion: null,
+    rememberMe: false
   };
 
   errores: {[key in CamposFormulario]: string} = {

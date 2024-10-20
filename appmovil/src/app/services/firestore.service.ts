@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { collectionData, Firestore } from '@angular/fire/firestore';
-import { collection, doc, setDoc } from 'firebase/firestore';
+import { collectionData, Firestore, doc, getDoc, deleteDoc, setDoc } from '@angular/fire/firestore';
+import { collection } from 'firebase/firestore';
 import { Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid'; 
 
@@ -47,6 +47,33 @@ export class FirestoreService {
     } catch (error) {
       console.error(`Error al crear el documento con ID ${idDoc} en la ruta: ${enlace}`, error);
       throw new Error(`No se pudo crear el documento con ID ${idDoc} en la ruta: ${enlace}`);
+    }
+  }
+
+    // Método para obtener un documento por su ID
+  async getDocumentById(enlace: string, idDoc: string): Promise<any> {
+    try {
+      const documentRef = doc(this.firestore, `${enlace}/${idDoc}`);
+      const documentSnap = await getDoc(documentRef);
+      if (documentSnap.exists()) {
+        return documentSnap.data();
+      } else {
+        throw new Error(`Documento con ID ${idDoc} no encontrado.`);
+      }
+    } catch (error) {
+      console.error(`Error al obtener documento con ID ${idDoc} de Firestore`, error);
+      throw error;
+    }
+  }
+
+  // Método para eliminar un documento
+  async deleteDocument(enlace: string, idDoc: string): Promise<void> {
+    try {
+      const documentRef = doc(this.firestore, `${enlace}/${idDoc}`);
+      await deleteDoc(documentRef);
+    } catch (error) {
+      console.error(`Error al eliminar documento con ID ${idDoc} de Firestore`, error);
+      throw error;
     }
   }
 

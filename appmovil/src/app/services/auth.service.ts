@@ -36,7 +36,7 @@ export class AuthService {
     await this.servicioAlmacenamiento.eliminar('email');
     await this.servicioAlmacenamiento.eliminar('password');
     */
-    await this.servicioAlmacenamiento.eliminar('rememberMe');
+    await this.servicioAlmacenamiento.eliminar('Usuarios','rememberMe');
 
     this.router.navigate(['/login']);
   }

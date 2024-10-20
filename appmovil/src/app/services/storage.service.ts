@@ -3,6 +3,7 @@ import { SQLiteDBConnection, SQLiteConnection } from '@capacitor-community/sqlit
 import { Storage } from '@ionic/storage-angular';
 import { Capacitor } from '@capacitor/core';
 import { CapacitorSQLite } from '@capacitor-community/sqlite';
+import { FirestoreService } from './firestore.service'; // Importar FirestoreService
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class ServicioAlmacenamiento {
   private sqliteConnection: SQLiteConnection | null = null; // Conexión SQLite
   private usandoSQL: boolean = false; // Indicador de uso de SQLite o Ionic Storage
 
-  constructor(private storage: Storage) {
+  constructor(private storage: Storage, private firestoreService: FirestoreService) {
     this.inicializar(); // Se inicializa el almacenamiento
   }
 
@@ -120,12 +121,11 @@ export class ServicioAlmacenamiento {
     }
   }
 
-  // Guardar un valor en el almacenamiento
+  // Guardar un valor en el almacenamiento (SQLite o Firebase)
   public async establecer(entidad: string, key: string, value: any): Promise<void> {
     await this.asegurarAlmacenamientoInicializado();
 
     try {
-      // Validaciones de las columnas
       if (!key) {
         throw new Error('La clave no puede ser vacía.');
       }
@@ -134,11 +134,12 @@ export class ServicioAlmacenamiento {
       }
 
       if (this.usandoSQL && this.dbSQLite) {
-        // Marcar el registro como no sincronizado (sincronizado = 0)
+        // SQLite: Marcar el registro como no sincronizado (sincronizado = 0)
         const query = `INSERT OR REPLACE INTO ${entidad} (id, datos, sincronizado) VALUES (?, ?, 0)`;
         await this.dbSQLite.run(query, [key, JSON.stringify(value)]);
-      } else if (this._almacenamiento) {
-        await this._almacenamiento.set(key, value);
+      } else {
+        // Firebase: Insertar o actualizar documento usando FirestoreService
+        await this.firestoreService.createDocumentID(value, entidad, key);
       }
     } catch (error) {
       console.error(`Error al guardar el valor para la clave: ${key}`, error);
@@ -146,7 +147,7 @@ export class ServicioAlmacenamiento {
     }
   }
 
-  // Obtener un valor del almacenamiento
+  // Obtener un valor del almacenamiento (SQLite o Firebase)
   public async obtener(entidad: string, key: string): Promise<any> {
     await this.asegurarAlmacenamientoInicializado();
 
@@ -156,6 +157,7 @@ export class ServicioAlmacenamiento {
       }
 
       if (this.usandoSQL && this.dbSQLite) {
+        // SQLite: Obtener valor
         const query = `SELECT datos FROM ${entidad} WHERE id = ?`;
         const result = await this.dbSQLite.query(query, [key]);
 
@@ -165,21 +167,18 @@ export class ServicioAlmacenamiento {
           console.log(`No se encontraron datos para la clave: ${key}`);
           return null;
         }
-      } else if (this._almacenamiento) {
-        return await this._almacenamiento.get(key);
+      } else {
+        // Firebase: Obtener documento usando FirestoreService
+        return await this.firestoreService.getDocumentById(entidad, key);
       }
     } catch (error) {
       console.error(`Error al obtener el valor para la clave: ${key}`, error);
       throw new Error(`No se pudo obtener el valor para la clave: ${key}.`);
     }
-
-    return null;
   }
 
-
-
-  // Eliminar un valor del almacenamiento
-  public async eliminar(key: string): Promise<void> {
+  // Eliminar un valor del almacenamiento (SQLite o Firebase)
+  public async eliminar(entidad: string, key: string): Promise<void> {
     await this.asegurarAlmacenamientoInicializado();
 
     try {
@@ -188,10 +187,12 @@ export class ServicioAlmacenamiento {
       }
 
       if (this.usandoSQL && this.dbSQLite) {
-        const query = `DELETE FROM datos WHERE clave = ?`;
+        // SQLite: Eliminar registro
+        const query = `DELETE FROM ${entidad} WHERE id = ?`;
         await this.dbSQLite.run(query, [key]);
-      } else if (this._almacenamiento) {
-        await this._almacenamiento.remove(key);
+      } else {
+        // Firebase: Eliminar documento usando FirestoreService
+        await this.firestoreService.deleteDocument(entidad, key);
       }
     } catch (error) {
       console.error(`Error al eliminar el valor para la clave: ${key}`, error);
