@@ -28,7 +28,6 @@ import { environment } from 'src/environments/environment.prod';
     ReactiveFormsModule,
     FormsModule,
     IonicStorageModule.forRoot(),
-    HttpClient
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

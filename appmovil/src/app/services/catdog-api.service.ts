@@ -4,27 +4,20 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root', // Esto hace que el servicio esté disponible en toda la aplicación
 })
 export class CatdogApiService {
-  private catApiUrl = 'URL_DE_LA_API_DE_GATOS'; // Reemplaza con tu URL real
-  private dogApiUrl = 'URL_DE_LA_API_DE_PERROS'; // Reemplaza con tu URL real
+  private catApiUrl = 'https://api.example.com/cats'; // Reemplaza con la URL real de tu API de gatos
+  private dogApiUrl = 'https://api.example.com/dogs'; // Reemplaza con la URL real de tu API de perros
 
   constructor(private http: HttpClient) {}
 
   getRandomCat(): Observable<any> {
-    return this.http.get<any>(this.catApiUrl);
+    return this.http.get<any>(this.catApiUrl); // Hacemos una solicitud GET a la API de gatos
   }
 
   getRandomDog(): Observable<any> {
-    return this.http.get<any>(this.dogApiUrl);
-  }
-
-  getCats(): Observable<any[]> {
-    return this.http.get<any[]>(this.catApiUrl); // Opcional: si tienes un endpoint para todos los gatos
-  }
-
-  getDogs(): Observable<any[]> {
-    return this.http.get<any[]>(this.dogApiUrl); // Opcional: si tienes un endpoint para todos los perros
+    return this.http.get<any>(this.dogApiUrl); // Hacemos una solicitud GET a la API de perros
   }
 }
+
