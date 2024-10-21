@@ -2,22 +2,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({
-  providedIn: 'root', // Esto hace que el servicio esté disponible en toda la aplicación
+  providedIn: 'root',
 })
 export class CatdogApiService {
-  private catApiUrl = 'https://api.example.com/cats'; // Reemplaza con la URL real de tu API de gatos
-  private dogApiUrl = 'https://api.example.com/dogs'; // Reemplaza con la URL real de tu API de perros
+  private catApiUrl = environment.firebaseConfig.catApiUrl;
+  private dogApiUrl = environment.firebaseConfig.dogApiUrl;
+  private catApiKey = environment.firebaseConfig.catApiKey;
+  private dogApiKey = environment.firebaseConfig.dogApiUrl; 
 
   constructor(private http: HttpClient) {}
 
   getRandomCat(): Observable<any> {
-    return this.http.get<any>(this.catApiUrl); // Hacemos una solicitud GET a la API de gatos
+    return this.http.get<any>(`${this.catApiUrl}?api_key=${this.catApiKey}`);
   }
 
   getRandomDog(): Observable<any> {
-    return this.http.get<any>(this.dogApiUrl); // Hacemos una solicitud GET a la API de perros
+    return this.http.get<any>(`${this.dogApiUrl}?api_key=${this.dogApiKey}`);
   }
 }
-
