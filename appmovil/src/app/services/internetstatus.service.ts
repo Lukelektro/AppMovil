@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
 })
 export class InternetstatusService {
   private isOnline: boolean = true;
+  private listenerUtilizado: boolean = false;
 
   constructor() {
     this.checkInternetInicial();
@@ -25,10 +26,14 @@ export class InternetstatusService {
 
   // Metodo para verificar cambios en la red
   listenerCambiosInternet() {
-    Network.addListener('networkStatusChange', (status) => {
-      this.isOnline = status.connected;
-      console.log('Estado de la red cambiado: ', this.isOnline ? 'En línea' : 'Sin conexión');
-    });
+    // Solo activa el listener si no está activo aún
+    if (!this.listenerUtilizado) {
+      Network.addListener('networkStatusChange', (status) => {
+        this.isOnline = status.connected;
+        console.log('Estado de la red cambiado: ', this.isOnline ? 'En línea' : 'Sin conexión');
+      });
+      this.listenerUtilizado = true; 
+    }
   }
 
   // Método para verificar el estado actual
