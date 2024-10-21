@@ -8,6 +8,8 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { ComponentsModule } from './components/components.module'; 
 import { IonicStorageModule } from '@ionic/storage-angular';
+import { HttpClient } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 
 //Firebase
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
@@ -27,8 +29,8 @@ import { environment } from 'src/environments/environment.prod';
     ComponentsModule,
     ReactiveFormsModule,
     FormsModule,
-    IonicStorageModule.forRoot()
-
+    IonicStorageModule.forRoot(),
+    HttpClient
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
@@ -38,6 +40,7 @@ import { environment } from 'src/environments/environment.prod';
     provideFirestore(() => getFirestore()),
     ScreenTrackingService,
     UserTrackingService,
+    provideHttpClient()
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA] 
