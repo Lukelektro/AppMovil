@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, AlertController } from '@ionic/angular';
 import { Usuario } from 'src/app/models/usuario.model';
-import { IonInput } from '@ionic/angular';
 import { FirestoreService } from 'src/app/services/firestore.service';
-import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
-
+import { Auth } from '@angular/fire/auth';
 
 // Definimos un tipo para los campos del formulario
 type CamposFormulario = 'nombre' | 'email' | 'password' | 'telefono' | 'direccion';
@@ -18,12 +16,12 @@ type CamposFormulario = 'nombre' | 'email' | 'password' | 'telefono' | 'direccio
 export class RegistroPage implements OnInit {
 
   newUsuario: Usuario = {
-    id:  this.firestoreService.createIdDoc(),
-    nombre: null,
-    email: null,
-    password: null,
-    telefono: null,
-    direccion: null,
+    id: this.firestoreService.createIdDoc(),  // Genera un nuevo ID
+    nombre: '',
+    email: '',
+    password: '',
+    telefono: '',
+    direccion: '',
   };
 
   errores: {[key in CamposFormulario]: string} = {
@@ -49,7 +47,6 @@ export class RegistroPage implements OnInit {
     const valor = evento.detail.value?.toString() || '';
     this.newUsuario[campo] = valor;
     this.validarCampo(campo, valor);
-
   }
 
   validarCampo(campo: CamposFormulario, valor: string) {
@@ -95,27 +92,24 @@ export class RegistroPage implements OnInit {
   }
 
   formularioValido(): boolean {
-    const camposLlenos = Object.values(this.newUsuario).every(valor => valor !== '');
+    const camposLlenos = Object.values(this.newUsuario).every(valor => valor !== '' && valor !== null); // Asegúrate de que no haya valores nulos
     const sinErrores = Object.values(this.errores).every(error => error === '');
     return camposLlenos && sinErrores;
   }
 
   async guardarCambios() {
-
-    console.log(this.newUsuario); //para ver el usuairo si entra xd hay que borrar depsues
+    console.log(this.newUsuario); // para verificar los valores del usuario
 
     if (this.formularioValido()) {
       try {
-        
-        //Guardar en Firestore
-        await this.firestoreService.createDocumentID(this.newUsuario,'Usuarios',this.newUsuario.id);
+        // Guardar en Firestore
+        await this.firestoreService.createDocumentID(this.newUsuario, 'Usuarios', this.newUsuario.id);
 
         await this.presentAlert();
         console.log('Usuario creado exitosamente');
         
       } catch (error: any) {
         console.error('Error al crear usuario:', error);
-
       }
     } else {
       console.log('El formulario contiene errores');

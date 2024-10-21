@@ -18,8 +18,6 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getAnalytics, provideAnalytics, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
 import { environment } from 'src/environments/environment.prod';
 
-
-
 @NgModule({
   declarations: [AppComponent],
   imports: [

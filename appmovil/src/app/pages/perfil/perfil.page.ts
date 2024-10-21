@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular'; // Importar LoadingController
 import { AuthService } from '../../services/auth.service';  // Importar AuthService
+import { FirestoreService } from 'src/app/services/firestore.service'; // Importar FirestoreService
 
 @Component({
   selector: 'app-perfil',
@@ -8,8 +9,6 @@ import { AuthService } from '../../services/auth.service';  // Importar AuthServ
   styleUrls: ['./perfil.page.scss'],
 })
 export class PerfilPage implements OnInit {
-
-  constructor(private alertController: AlertController, private authService: AuthService) {}  // Inyectar el servicio AuthService
 
   perfil: any = {
     nombre: '',
@@ -27,21 +26,49 @@ export class PerfilPage implements OnInit {
     direccion: ''
   };
 
-  ngOnInit() {
-    this.cargarPerfil();
+  constructor(
+    private alertController: AlertController, 
+    private authService: AuthService,
+    private firestoreService: FirestoreService,
+    private loadingController: LoadingController  
+  ) {}
+
+  async ngOnInit() {
+    await this.mostrarLoading();
+    await this.cargarPerfil();
   }
 
-  cargarPerfil() {
-    const perfilGuardado = localStorage.getItem('perfil');
-    if (perfilGuardado) {
-      this.perfil = JSON.parse(perfilGuardado);
-    } else {
-      this.perfil = {
-        nombre: 'Martín López',
-        email: 'martin.lopez@ejemplo.com',
-        telefono: '+1234567890',
-        direccion: 'Calle Principal 123, Ciudad'
-      };
+  // Mostrar el loading spinner
+  async mostrarLoading() {
+    const loading = await this.loadingController.create({
+      message: 'Cargando perfil...',
+      spinner: 'circles',
+      duration: 3000
+    });
+
+    await loading.present();
+  }
+
+  // Método para cargar el perfil
+  async cargarPerfil() {
+    const emailAutenticado = this.authService.getAuthenticatedEmail();
+    console.log(`Cargando perfil para el email autenticado: ${emailAutenticado}`);
+
+    try {
+      // Intentar cargar el perfil desde Firestore
+      const usuario = await this.firestoreService.getDocumentByEmail('Usuarios', emailAutenticado);
+
+      if (usuario) {
+        this.perfil = usuario;
+        console.log('Perfil cargado:', this.perfil);
+      } else {
+        console.log('No se encontró el perfil.');
+      }
+    } catch (error) {
+      console.error('Error al cargar el perfil:', error);
+    } finally {
+      // Ocultar el loading spinner
+      this.loadingController.dismiss();
     }
   }
 
@@ -51,6 +78,7 @@ export class PerfilPage implements OnInit {
     this.validarCampo(campo, valor);
   }
 
+  // Validaciones de los campos
   validarCampo(campo: string, valor: string) {
     switch (campo) {
       case 'nombre':
@@ -95,13 +123,35 @@ export class PerfilPage implements OnInit {
 
   guardarCambios() {
     if (this.formularioValido()) {
-      localStorage.setItem('perfil', JSON.stringify(this.perfil));
-      this.presentAlert();
-      console.log('Cambios guardados:', this.perfil);
+      const email = this.authService.getAuthenticatedEmail();
+      if (email) {
+        // Primero obtenemos el perfil actual usando el email
+        this.firestoreService.getDocumentByEmail('Usuarios', email)
+          .then((perfilActual) => {
+            if (perfilActual) {
+              const idDoc = perfilActual.id; // Mantén el ID del documento original
+  
+              // Ahora actualizamos el documento en Firestore con los nuevos datos
+              this.firestoreService.updateDocumentById('Usuarios', idDoc, this.perfil)
+                .then(() => {
+                  this.alertaExito();  // Mostrar alerta de éxito
+                  console.log('Cambios guardados en Firebase:', this.perfil);
+                })
+                .catch((error) => {
+                  console.error('Error al guardar los cambios en Firebase:', error);
+                });
+            }
+          })
+          .catch((error) => {
+            console.error('Error al obtener el perfil actual:', error);
+          });
+      }
     } else {
       console.log('El formulario contiene errores');
     }
   }
+  
+
 
   formularioValido(): boolean {
     const camposLlenos = Object.values(this.perfil).every(valor => valor !== '');
@@ -109,7 +159,7 @@ export class PerfilPage implements OnInit {
     return camposLlenos && sinErrores;
   }
 
-  async presentAlert() {
+  async alertaExito() {
     const alert = await this.alertController.create({
       header: 'Perfil Editado',
       message: 'Se ha editado su perfil correctamente',

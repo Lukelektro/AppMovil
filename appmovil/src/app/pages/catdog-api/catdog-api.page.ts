@@ -1,4 +1,3 @@
-// catdog-api.page.ts
 import { Component } from '@angular/core';
 import { CatdogApiService } from '../../services/catdog-api.service';
 
@@ -11,34 +10,29 @@ export class CatdogApiPage {
   catImageUrl: string = '';
   dogImageUrl: string = '';
 
-  constructor(private catDogApiService: CatdogApiService) {}
+  constructor(private catDogApiService: CatDogApiService) {}
 
+  // Obtener imagen de un gato
   fetchCat() {
-    this.catDogApiService.getRandomCat().subscribe({
-      next: (response) => {
+    this.CatdogApiService.getRandomCat().subscribe(
+      (response) => {
         this.catImageUrl = response[0].url;
       },
-      error: (error) => {
+      (error) => {
         console.error('Error al obtener la imagen de gato', error);
-      },
-      complete: () => {
-        console.log('Solicitud de gato completada');
-      },
-    });    
+      }
+    );
   }
 
+  // Obtener imagen de un perro
   fetchDog() {
-    this.catDogApiService.getRandomDog().subscribe({
-      next: (response: any) => {
-        this.dogImageUrl = response[0].url; // Asegúrate de que esta estructura sea correcta
+    this.CatdogApiService.getRandomDog().subscribe(
+      (response) => {
+        this.dogImageUrl = response[0].url;
       },
-      error: (error: any) => {
+      (error) => {
         console.error('Error al obtener la imagen de perro', error);
-      },
-      complete: () => {
-        console.log('Solicitud de perro completada');
       }
-    });
+    );
   }
-  
 }

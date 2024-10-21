@@ -28,7 +28,15 @@ const routes: Routes = [
   {
     path: 'tab',
     loadChildren: () => import('./pages/tab/tab.module').then(m => m.TabPageModule)
+  },  {
+    path: 'catdog-api',
+    loadChildren: () => import('./pages/catdog-api/catdog-api.module').then( m => m.CatdogApiPageModule)
   },
+  {
+    path: 'menu-mas',
+    loadChildren: () => import('./pages/menu-mas/menu-mas.module').then( m => m.MenuMasPageModule)
+  },
+
 ];
 
 @NgModule({

@@ -1,0 +1,27 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Cat and Dog API</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Cat and Dog API</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Obtener Imágenes de Gatos y Perros</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-button expand="full" (click)="fetchCat()">Obtener Gato</ion-button>
+      <ion-img [src]="catImageUrl" *ngIf="catImageUrl"></ion-img>
+
+      <ion-button expand="full" (click)="fetchDog()">Obtener Perro</ion-button>
+      <ion-img [src]="dogImageUrl" *ngIf="dogImageUrl"></ion-img>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
