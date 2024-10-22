@@ -20,31 +20,32 @@ export class InventoryPage implements OnInit {
   productos: Producto[] = [];
 
   CargarProductos() {
-
     this.firestoreService.getItemsChanges<Producto>('Productos').subscribe( data => {
-
       if (data) {
         this.productos = data
       }
-      
     });
 
   }
 
-  categorias = this.productos;
+  categorias = ['Todos','alimentos','juguetes'];
   categoriaActual = 'Todos';
   
   cartItems$: Observable<CartItem[]>;
   cartTotal: number = 0;
 
-  constructor(private cartService: CartService, private menuCtrl: MenuController, private route: ActivatedRoute, private loadingController: LoadingController, private firestoreService: FirestoreService) {
-    this.cartItems$ = this.cartService.getCart();
+  constructor(
+    private cartService: CartService, 
+    private menuCtrl: MenuController, 
+    private route: ActivatedRoute, 
+    private loadingController: LoadingController, 
+    private firestoreService: FirestoreService) {
   }
 
   ngOnInit() {
 
+    this.cartItems$ = this.cartService.getCart();
     this.CargarProductos();
-
 
     // Leer parámetros de la URL
     this.route.queryParams.subscribe(params => {
