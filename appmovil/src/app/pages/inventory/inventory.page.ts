@@ -25,10 +25,9 @@ export class InventoryPage implements OnInit {
         this.productos = data
       }
     });
-
   }
 
-  categorias = ['Todos','alimentos','juguetes'];
+  categorias = ['Todos','Alimentos','Sanitarios','Juguetes','Salud e Higiene'];
   categoriaActual = 'Todos';
   
   cartItems$: Observable<CartItem[]>;

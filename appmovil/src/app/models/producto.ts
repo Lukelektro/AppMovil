@@ -4,5 +4,6 @@ export class Producto {
     valor: number;
     categoria: string;
     id: string;
+    imagenUrl?: string;
 
 }

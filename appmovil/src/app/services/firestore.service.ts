@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { collectionData, Firestore, doc, getDoc, getDocs, deleteDoc, setDoc, query, where } from '@angular/fire/firestore';
+import { Storage, ref, getDownloadURL } from '@angular/fire/storage';
 import { collection } from 'firebase/firestore';
 import { Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid'; 
@@ -10,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class FirestoreService {
 
   private firestore: Firestore = inject(Firestore);
+  private storage: Storage = inject(Storage);
 
   constructor() { }
 
@@ -142,4 +144,68 @@ export class FirestoreService {
       throw new Error('No se pudo generar un ID aleatorio');
     }
   }
+
+  // Nuevo método para obtener la URL de una imagen de Storage
+  async getImageUrl(imagePath: string): Promise<string> {
+    try {
+      const storageRef = ref(this.storage, imagePath);
+      const url = await getDownloadURL(storageRef);
+      console.log(`URL de imagen obtenida: ${url}`);
+      return url;
+    } catch (error) {
+      console.error(`Error al obtener URL de la imagen: ${imagePath}`, error);
+      throw new Error(`No se pudo obtener la URL de la imagen: ${imagePath}`);
+    }
+  }
+
+  // Método para crear documento con imagen
+  async createDocumentWithImage(data: any, enlace: string, imagePath: string): Promise<void> {
+    try {
+      // Generar ID único
+      const id = this.createIdDoc();
+      
+      // Obtener URL de la imagen
+      const imageUrl = await this.getImageUrl(imagePath);
+      
+      // Crear objeto con datos e imagen
+      const documentData = {
+        ...data,
+        id,
+        imageUrl,
+        imagePath
+      };
+      
+      // Crear documento usando el método existente
+      await this.createDocumentID(documentData, enlace, id);
+      
+    } catch (error) {
+      console.error('Error al crear documento con imagen:', error);
+      throw error;
+    }
+  }
+
+  // Método para actualizar documento con nueva imagen
+  async updateDocumentWithImage(enlace: string, id: string, data: any, newImagePath?: string): Promise<void> {
+    try {
+      let updatedData = { ...data };
+      
+      // Si se proporciona nueva ruta de imagen, actualizar URL
+      if (newImagePath) {
+        const imageUrl = await this.getImageUrl(newImagePath);
+        updatedData = {
+          ...updatedData,
+          imageUrl,
+          imagePath: newImagePath
+        };
+      }
+      
+      // Actualizar documento usando el método existente
+      await this.updateDocumentById(enlace, id, updatedData);
+      
+    } catch (error) {
+      console.error('Error al actualizar documento con imagen:', error);
+      throw error;
+    }
+  }
+
 }
