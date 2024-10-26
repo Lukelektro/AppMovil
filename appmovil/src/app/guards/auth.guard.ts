@@ -11,4 +11,7 @@ export class AuthGuard implements CanActivate {
   canActivate(): boolean {
     return this.authService.estaLogeado(); // Da true si el usuario está autenticado (estan en bruto por el momento)
   }
+
+  
+
 }

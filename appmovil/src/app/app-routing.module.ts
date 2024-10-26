@@ -27,14 +27,18 @@ const routes: Routes = [
   },
   {
     path: 'tab',
-    loadChildren: () => import('./pages/tab/tab.module').then(m => m.TabPageModule)
-  },  {
+    loadChildren: () => import('./pages/tab/tab.module').then(m => m.TabPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'catdog-api',
-    loadChildren: () => import('./pages/catdog-api/catdog-api.module').then( m => m.CatdogApiPageModule)
+    loadChildren: () => import('./pages/catdog-api/catdog-api.module').then( m => m.CatdogApiPageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'menu-mas',
-    loadChildren: () => import('./pages/menu-mas/menu-mas.module').then( m => m.MenuMasPageModule)
+    loadChildren: () => import('./pages/menu-mas/menu-mas.module').then( m => m.MenuMasPageModule),
+    canActivate: [AuthGuard]
   },
 
 ];

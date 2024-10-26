@@ -149,14 +149,16 @@ export class FirestoreService {
   async getImageUrl(imagePath: string): Promise<string> {
     try {
       const storageRef = ref(this.storage, imagePath);
-      const url = await getDownloadURL(storageRef);
-      console.log(`URL de imagen obtenida: ${url}`);
+      console.log(storageRef);  // Esto mostrará la referencia del almacenamiento
+      const url = await getDownloadURL(storageRef);  // Usa await para obtener la URL
+      console.log(`URL de imagen obtenida de Firebase: ${url}`);
       return url;
     } catch (error) {
       console.error(`Error al obtener URL de la imagen: ${imagePath}`, error);
       throw new Error(`No se pudo obtener la URL de la imagen: ${imagePath}`);
     }
   }
+  
 
   // Método para crear documento con imagen
   async createDocumentWithImage(data: any, enlace: string, imagePath: string): Promise<void> {

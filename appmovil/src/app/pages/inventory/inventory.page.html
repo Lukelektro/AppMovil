@@ -1,3 +1,4 @@
+<!-- Menu del carrito -->
 <ion-menu side="end" menuId="cart-menu" contentId="main-content">
   <ion-header>
     <ion-toolbar>
@@ -16,37 +17,47 @@
   </ion-content>
 </ion-menu>
 
-
+<!-- Header principal -->
 <ion-header>
   <app-toolbar [showCartButton]="true"></app-toolbar> 
 </ion-header>
 
-<!-- El contenido principal -->
+<!-- Contenido principal -->
 <ion-content id="main-content">
   <div class="container">
     <h1 class="custom-title">Productos para Animales</h1>
 
+    <!-- Segmento de categorías -->
     <ion-segment (ionChange)="setCategoriaActual($event)" [value]="categoriaActual">
       <ion-segment-button *ngFor="let categoria of categorias" [value]="categoria">
         <ion-label>{{ categoria }}</ion-label>
       </ion-segment-button>
     </ion-segment>
 
-    
-
+    <!-- Grid de productos -->
     <ion-grid>
       <ion-row>
         <ion-col size="12" size-md="6" size-lg="4" *ngFor="let producto of productosFiltrados">
           <ion-card>
+            <!-- Contenedor de imagen con loading -->
+            <div>
+              <img *ngIf="!isImageLoading(producto.id)" [src]="producto.imagenUrl" (error)="handleImageError($event, producto)" />
+              <ion-spinner *ngIf="isImageLoading(producto.id)"></ion-spinner>
+            </div>
+
             <ion-card-header>
               <ion-card-title>{{ producto.nombre }}</ion-card-title>
+              <ion-card-subtitle>$ {{ producto.valor }}</ion-card-subtitle>
             </ion-card-header>
+
             <ion-card-content>
-              <p>Precio: €{{ producto.valor }}</p>
-              <p>Categoría: {{ producto.categoria }}</p>
-              <img [src]="producto.imagenUrl" [alt]="producto.nombre">
-              <ion-button expand="block" (click)="addToCart(producto)">Añadir al carrito</ion-button>
+              <p>{{ producto.categoria }}</p>
+              <ion-button expand="block" (click)="addToCart(producto)">
+                <ion-icon name="cart-outline" slot="start"></ion-icon>
+                Añadir al carrito
+              </ion-button>
             </ion-card-content>
+
           </ion-card>
         </ion-col>
       </ion-row>
