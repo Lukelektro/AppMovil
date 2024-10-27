@@ -40,6 +40,11 @@ const routes: Routes = [
     loadChildren: () => import('./pages/menu-mas/menu-mas.module').then( m => m.MenuMasPageModule),
     canActivate: [AuthGuard]
   },
+  {
+    path: 'raza',
+    loadChildren: () => import('./pages/raza/raza.module').then( m => m.RazaPageModule)
+  },
+
 
 ];
 

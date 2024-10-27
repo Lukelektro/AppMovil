@@ -41,7 +41,8 @@
           <ion-card>
             <!-- Contenedor de imagen con loading -->
             <div>
-              <img *ngIf="!isImageLoading(producto.id)" [src]="producto.imagenUrl" (error)="handleImageError($event, producto)" />
+              <ion-img *ngIf="!isImageLoading(producto.id)" [src]="producto.imagenUrl" class="" (error)="handleImageError($event, producto)">
+              </ion-img>
               <ion-spinner *ngIf="isImageLoading(producto.id)"></ion-spinner>
             </div>
 

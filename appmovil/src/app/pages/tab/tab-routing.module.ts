@@ -16,8 +16,8 @@ const routes: Routes = [
         loadChildren: () => import('./../../pages/inventory/inventory.module').then( m => m.InventoryPageModule)
       },
       {
-        path: 'menu-mas',
-        loadChildren: () => import('./../../pages/menu-mas/menu-mas.module').then( m => m.MenuMasPageModule)
+        path: 'raza',
+        loadChildren: () => import('./../../pages/raza/raza.module').then( m => m.RazaPageModule)
       },
       {
         path : 'perfil',
