@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title size="large">Reconocer Raza</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="container">
+    <h2>Captura una imagen de tu mascota</h2>
+    <ion-button expand="full" (click)="capturarImagen()">
+      Abrir Cámara
+    </ion-button>
+  <!--
+    <div *ngIf="capturarImagen">
+      <h3>Imagen Capturada:</h3>
+      <img [src]="capturarImagen" alt="Imagen de la mascota" />  
+    </div>
+  -->
+  </div>
+</ion-content>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+  }
+</style>

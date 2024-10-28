@@ -30,20 +30,20 @@ export class InventoryPage implements OnInit {
   
           // Cargar las imágenes después de que los productos hayan sido cargados
           for (const producto of this.productos) {
-            console.log(producto.imagenUrl);
-            if (producto.id && producto.imagenUrl && !producto.imagenUrl.startsWith('https')) {
-              this.loadingImages[producto.id] = true;
-              try {
-                const url = await this.firestoreService.getImageUrl(producto.imagenUrl);
-                producto.imagenUrl = url;
-                console.log(url);
-              } catch (error) {
-                console.error(`Error al cargar imagen para producto ${producto.id}:`, error);
-                producto.imagenUrl = 'assets/placeholder-image.jpg';
-              } finally {
-                this.loadingImages[producto.id] = false;
-              }
+
+            this.loadingImages[producto.id] = true;
+
+            try {
+              const url = await this.firestoreService.getImageUrl(producto.imagenUrl);
+              producto.imagenUrl = url;
+              console.log(url);
+            } catch (error) {
+              console.error(`Error al cargar imagen para producto ${producto.id}:`, error);
+              producto.imagenUrl = 'assets/placeholder-image.jpg';
+            } finally {
+              this.loadingImages[producto.id] = false;
             }
+            
           }
         }
       });
