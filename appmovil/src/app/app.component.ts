@@ -7,6 +7,11 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
 
+  public appPages = [
+    { title: 'Inicio', url: '/tab/home', icon: 'home' },
+    { title: 'Perfil', url: '/perfil', icon: 'person' },
+    
+  ];
 
   constructor() {
     
