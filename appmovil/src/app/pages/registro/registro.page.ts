@@ -79,7 +79,7 @@ export class RegistroPage implements OnInit {
   }
 
   validarPassword(password: string): string {
-    return password.length < 6 ? 'La contraseña debe tener al menos 6 caracteres' : '';
+    return password.length < 5 ? 'La contraseña debe tener al menos 5 caracteres' : '';
   }
 
   validarTelefono(telefono: string): string {
