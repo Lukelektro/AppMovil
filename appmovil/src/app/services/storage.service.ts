@@ -13,6 +13,7 @@ export class ServicioAlmacenamiento {
   private dbSQLite: SQLiteDBConnection | null = null; // para móvil.
   private sqliteConnection: SQLiteConnection | null = null; // Conexión SQLite
   private usandoSQL: boolean = false; // Indicador de uso de SQLite o Ionic Storage
+  private readonly DB_NAME = 'dbPetshopFancy';
 
   constructor(private storage: Storage, private firestoreService: FirestoreService) {
     this.inicializar(); // Se inicializa el almacenamiento
@@ -34,17 +35,33 @@ export class ServicioAlmacenamiento {
   // Inicializa SQLite para el entorno móvil
   private async inicializarSQLite() {
     try {
-      if (!this.dbSQLite) {
-        this.sqliteConnection = new SQLiteConnection(CapacitorSQLite);
+      // 1. Get SQLite connection
+      this.sqliteConnection = new SQLiteConnection(CapacitorSQLite);
     
-        this.dbSQLite = await this.sqliteConnection.createConnection('dbPetshopFancy', false, 'no-encryption', 1, false);
-        await this.dbSQLite.open();
-        await this.crearTabla('entidad_generica');
-      } else {
-        console.warn('La conexión SQLite ya está activa.');
+      // 2. Check for existing connection and close if needed
+      const isConnection = await this.sqliteConnection.isConnection(this.DB_NAME, false);
+      if (isConnection.result) {
+        await this.sqliteConnection.closeConnection(this.DB_NAME, false);
       }
+ 
+      // 3. Create new connection
+      this.dbSQLite = await this.sqliteConnection.createConnection(
+        this.DB_NAME,
+        false,
+        'no-encryption',
+        1,
+        false
+      );
+
+      // 4. Open database
+      await this.dbSQLite.open();
+      
+      // 5. Set flag
+      this.usandoSQL = true;
+ 
     } catch (error) {
-      console.error('Error al inicializar SQLite: ', error);
+      console.error('Error al inicializar SQLite:', error);
+      this.usandoSQL = false;
       throw new Error('No se pudo inicializar la conexión a SQLite. (inicializarSQLite)');
     }
   }
@@ -74,24 +91,23 @@ export class ServicioAlmacenamiento {
     }
   }
 
-  // Método asincrónico para iniciar el almacenamiento local o SQLite, dependiendo del dispositivo
-  async inicializar() {
-    try {
-      const platform = Capacitor.getPlatform();
+  // Método para iniciar el almacenamiento local o SQLite, dependiendo del dispositivo
+  public async inicializar() {
+    if (Capacitor.isNativePlatform()) {
+      await this.inicializarSQLite();
+    } else {
+      await this.inicializarIonicStorage();
+    }
+  }
 
-      if (platform === 'ios' || platform === 'android') {
-        this.usandoSQL = true;
-        await this.inicializarSQLite();
-      } else if (platform === 'web') {
-        await this.inicializarIonicStorage();
-      } else {
-        console.warn(`Plataforma desconocida: ${platform}. Usando almacenamiento por defecto.`);
-        await this.inicializarSQLite();
+  // Add cleanup method
+  public async cleanup() {
+    if (this.usandoSQL && this.sqliteConnection) {
+      try {
+        await this.sqliteConnection.closeConnection(this.DB_NAME, false);
+      } catch (error) {
+        console.error('Error al cerrar conexión SQLite:', error);
       }
-      
-    } catch (error) {
-      console.error('Error al inicializar almacenamiento:', error);
-      throw new Error('Error inicializando el sistema de almacenamiento. (inicializar)');
     }
   }
 
