@@ -18,7 +18,6 @@ import { getStorage, provideStorage } from '@angular/fire/storage';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getAnalytics, provideAnalytics, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
 import { environment } from 'src/environments/environment.prod';
-import { Camera } from '@ionic-native/camera';
 
 @NgModule({
   declarations: [AppComponent],
@@ -42,7 +41,6 @@ import { Camera } from '@ionic-native/camera';
     ScreenTrackingService,
     UserTrackingService,
     provideHttpClient(),
-    Camera
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA] 

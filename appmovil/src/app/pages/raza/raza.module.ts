@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular'; 
 import { RazaPageRoutingModule } from './raza-routing.module';
 import { RazaPage } from './raza.page';
-import { Camera } from '@ionic-native/camera/ngx'; 
+import { Camera } from '@awesome-cordova-plugins/camera/ngx';
 
 @NgModule({
   imports: [

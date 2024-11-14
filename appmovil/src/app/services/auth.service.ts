@@ -21,57 +21,44 @@ export class AuthService {
   ) {}
 
     // Método de inicio de sesión
-  async login(email: string, password: string, rememberMe: boolean): Promise<boolean> {
-    try {
-      console.log(`Intentando iniciar sesión con email: ${email}`);
+    async login(email: string, password: string, rememberMe: boolean): Promise<boolean> {
+      try {
+        if (this.internetstatusService.estaConectado()) {
+          console.log('Conexión a internet detectada, autenticando con Firebase');
+          
+          const user = await this.firestoreService.getDocumentByEmail('Usuarios', email);
       
-      // Verificar si hay conexión a internet
-      if (this.internetstatusService.estaConectado()) {
-        console.log('Conexión a internet detectada, autenticando con Firebase');
-        
-        // Obtener el usuario por email
-        const user = await this.firestoreService.getDocumentByEmail('Usuarios', email);
+          if (user && user.password === password) {
+            console.log('Usuario autenticado en Firebase');
+            this.estaAutenticado = true;
+            this.emailAutenticado = email;
     
-        if (user && user.password === password) {
-          console.log('Usuario autenticado en Firebase');
-          this.estaAutenticado = true;
-          this.emailAutenticado = email;
-
-          // Comprobar si ya hay una sesión activa para este usuario
-          const sesionActiva = await this.sesionService.getSesionActiva(user.id);
-          if (sesionActiva) {
-            console.log('Ya existe una sesión activa para este usuario.');
-          } else {
-            // Crear una nueva sesión solo si no hay una activa
-            await this.sesionService.crearSesion(user.id, rememberMe);
+            try {
+              // Check for active session
+              const sesionActiva = await this.sesionService.getSesionActiva(user.id);
+              
+              if (sesionActiva) {
+                console.log('Sesión activa encontrada');
+                return true;
+              }
+    
+              // Create new session
+              await this.sesionService.crearSesion(user.id, rememberMe);
+              return true;
+              
+            } catch (error) {
+              console.error('Error en gestión de sesiones:', error);
+              // Continue with authentication even if session management fails
+              return true;
+            }
           }
-
-          return true;
-        } else {
-          console.log('Credenciales incorrectas en Firebase');
-          return false;
         }
-      } else {
-        console.log('Sin conexión a internet, autenticando con almacenamiento local');
-        
-        const emailAlmacenado = await this.servicioAlmacenamiento.obtener('Usuarios', 'email');
-        const passwordAlmacenado = await this.servicioAlmacenamiento.obtener('Usuarios', 'password');
-        
-        if (emailAlmacenado === email && passwordAlmacenado === password) {
-          console.log('Usuario autenticado en almacenamiento local');
-          this.estaAutenticado = true;
-          this.emailAutenticado = email;
-          return true;
-        } else {
-          console.log('Credenciales incorrectas en almacenamiento local');
-          return false;
-        }
+        return false;
+      } catch (error) {
+        console.error('Error en login:', error);
+        return false;
       }
-    } catch (error) {
-      console.error('Error durante el inicio de sesión:', error);
-      return false;
     }
-  }
 
   // Método para salir (logout)
   async logout() {
