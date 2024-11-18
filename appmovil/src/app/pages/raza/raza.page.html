@@ -5,18 +5,51 @@
 </ion-header>
 
 <ion-content>
-  <div class="container">
-    <h2>Captura una imagen de tu mascota</h2>
-    <ion-button expand="full" (click)="capturarImagen()">
-      Abrir Cámara
-    </ion-button>
-  <!--
-    <div *ngIf="capturarImagen">
-      <h3>Imagen Capturada:</h3>
-      <img [src]="capturarImagen" alt="Imagen de la mascota" />  
-    </div>
-  -->
-  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" class="ion-text-center">
+        <ion-button (click)="capturarImagen()">
+          <ion-icon slot="start" name="camera"></ion-icon>
+          Tomar Foto
+        </ion-button>
+      </ion-col>
+    </ion-row>
+
+    <ion-row *ngIf="imagenBase64">
+      <ion-col size="12">
+        <ion-card>
+          <img [src]="imagenBase64" />
+          <ion-card-header>
+            <ion-card-title>Análisis de la Imagen</ion-card-title>
+          </ion-card-header>
+          
+          <ion-card-content *ngIf="resultadosAnalisis">
+            <ion-list>
+              <ion-item>
+                <ion-label>
+                  <h2>Tipo de Animal</h2>
+                  <p>{{ resultadosAnalisis.tipoAnimal }}</p>
+                  <p>Confianza: {{ resultadosAnalisis.confianzaDeteccion }}%</p>
+                </ion-label>
+              </ion-item>
+
+              <ion-item-divider>
+                <ion-label>Razas Identificadas</ion-label>
+              </ion-item-divider>
+
+              <ion-item *ngFor="let raza of resultadosAnalisis.razasPosibles">
+                <ion-label>
+                  <h2>{{ raza.nombre }}</h2>
+                  <p>{{ raza.tipo }}</p>
+                  <p>Confianza: {{ raza.confianza }}%</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
 
 <style>

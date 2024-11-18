@@ -3,6 +3,8 @@ import { AppModule } from './app/app.module';
 import { register } from 'swiper/element/bundle';
 import { enableProdMode, NgZone } from '@angular/core';
 import { environment } from './environments/environment';
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+defineCustomElements(window);
 
 register();
 
