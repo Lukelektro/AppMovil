@@ -1,108 +1,195 @@
 import { Injectable } from '@angular/core';
+import * as tf from '@tensorflow/tfjs';
+import * as mobilenet from '@tensorflow-models/mobilenet';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { environment } from 'src/environments/environment';
+import { Observable, from, of, forkJoin } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs/operators';
+
+interface Prediccion {
+  className: string;
+  probability: number;
+}
+
+interface ResultadoClasificacion {
+  tipoAnimal: string;
+  razaMasConfiable: string;
+  confianzaDeteccion: string;
+}
+
+interface RazaAPI {
+  id: number;
+  name: string;
+  life_span: string;
+  origin?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class VisionAIService {
-  private readonly API_URL = 'https://vision.googleapis.com/v1/images:annotate';
-  
-  constructor(private http: HttpClient) {}
+  private mobilenetModel: mobilenet.MobileNet | null = null;
+  private razasPerro: string[] = [];
+  private razasGato: string[] = [];
 
-  analizarImagen(imageUrl: string): Observable<any> {
-    const requestBody = {
-      requests: [{
-        image: {
-          source: {
-            imageUri: imageUrl
-          }
-        },
-        features: [
-          {
-            type: 'LABEL_DETECTION',
-            maxResults: 15
-          },
-          {
-            type: 'WEB_DETECTION',
-            maxResults: 10
-          },
-          {
-            type: 'OBJECT_LOCALIZATION',
-            maxResults: 5
-          }
-        ]
-      }]
-    };
+  constructor(private http: HttpClient) {
+    this.loadBackend();
+    this.cargarRazas();
+  }
 
-    return this.http.post(
-      `${this.API_URL}?key=${environment.googleCloudApiKey}`,
-      requestBody
-    ).pipe(
-      map((response: any) => {
-        const visionResponse = response.responses[0];
-        const labels = visionResponse.labelAnnotations || [];
-        const webDetection = visionResponse.webDetection || {};
-        const objects = visionResponse.localizedObjectAnnotations || [];
+  private cargarRazas() {
+    // Fetch dog breeds
+    this.http.get<RazaAPI[]>('https://api.thedogapi.com/v1/breeds').pipe(
+      map(razas => this.razasPerro = razas.map(raza => raza.name.toLowerCase()))
+    ).subscribe();
 
-        // Filtrar y procesar etiquetas relacionadas con razas
-        const breedLabels = labels.filter((label: any) => {
-          const desc = label.description.toLowerCase();
-          return desc.includes('breed') || 
-                 desc.includes('terrier') ||
-                 desc.includes('shepherd') ||
-                 desc.includes('retriever') ||
-                 desc.includes('bulldog') ||
-                 desc.includes('poodle') ||
-                 desc.includes('husky') ||
-                 // Agregar más razas comunes aquí
-                 desc.includes('spaniel');
+    // Fetch cat breeds
+    this.http.get<RazaAPI[]>('https://api.thecatapi.com/v1/breeds').pipe(
+      map(razas => this.razasGato = razas.map(raza => raza.name.toLowerCase()))
+    ).subscribe();
+  }
+
+  private async loadBackend() {
+    try {
+      await tf.setBackend('webgl');
+      
+      if (!tf.getBackend()) {
+        await tf.setBackend('cpu');
+      }
+      
+      console.log('Backend actual:', tf.getBackend());
+    } catch (error) {
+      console.error('Error al configurar backend:', error);
+    }
+  }
+
+  private async loadModels() {
+    try {
+      if (!tf.getBackend()) {
+        await this.loadBackend();
+      }
+
+      this.mobilenetModel = await mobilenet.load();
+      console.log('Modelo MobileNet cargado exitosamente');
+    } catch (error) {
+      console.error('Error cargando modelos:', error);
+      throw error;
+    }
+  }
+
+  analizarImagen(imageInput: File | string): Observable<ResultadoClasificacion> {
+    if (!this.mobilenetModel) {
+      return from(this.loadModels()).pipe(
+        switchMap(() => this.procesarImagen(imageInput)),
+        catchError(error => {
+          console.error('Error en la carga de modelos:', error);
+          return of({
+            tipoAnimal: 'No identificado',
+            razaMasConfiable: 'N/A',
+            confianzaDeteccion: '0'
+          });
+        })
+      );
+    }
+
+    return this.procesarImagen(imageInput);
+  }
+
+  private procesarImagen(imageInput: File | string): Observable<ResultadoClasificacion> {
+    return from(this.prepareImage(imageInput)).pipe(
+      switchMap(imagen => this.clasificarRaza(imagen)),
+      catchError(error => {
+        console.error('Error en procesamiento de imagen:', error);
+        return of({
+          tipoAnimal: 'No identificado',
+          razaMasConfiable: 'N/A',
+          confianzaDeteccion: '0'
         });
-
-        // Procesar detección web para encontrar coincidencias de razas
-        const webEntities = webDetection.webEntities || [];
-        const breedEntities = webEntities.filter((entity: any) => {
-          // Verificar que entity y description existen antes de usar toLowerCase()
-          if (!entity || !entity.description) {
-            return false;
-          }
-          const desc = entity.description.toLowerCase();
-          return desc.includes('breed') || 
-                desc.includes('dog') || 
-                desc.includes('cat');
-        });
-
-        // Combinar y ordenar resultados por confianza
-        const allBreedResults = [
-          ...breedLabels.map((label: any) => ({
-            tipo: 'Raza detectada',
-            nombre: label.description,
-            confianza: (label.score * 100).toFixed(2)
-          })),
-          ...breedEntities.map((entity: any) => ({
-            tipo: 'Coincidencia web',
-            nombre: entity.description,
-            confianza: (entity.score * 100).toFixed(2)
-          }))
-        ].sort((a, b) => parseFloat(b.confianza) - parseFloat(a.confianza));
-
-        // Determinar el tipo de animal
-        const isDog = objects.some((obj: any) => 
-          obj.name.toLowerCase() === 'dog'
-        );
-        const isCat = objects.some((obj: any) => 
-          obj.name.toLowerCase() === 'cat'
-        );
-
-        return {
-          tipoAnimal: isDog ? 'Perro' : (isCat ? 'Gato' : 'No identificado'),
-          razasPosibles: allBreedResults,
-          confianzaDeteccion: objects[0]?.score ? 
-            (objects[0].score * 100).toFixed(2) : '0'
-        };
       })
     );
+  }
+
+  private async prepareImage(imageInput: File | string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const imagen = new Image();
+      
+      if (typeof imageInput === 'string') {
+        imagen.crossOrigin = 'anonymous';
+        imagen.src = imageInput;
+      } else {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          imagen.src = e.target?.result as string;
+        };
+        reader.readAsDataURL(imageInput);
+      }
+
+      imagen.onload = () => resolve(imagen);
+      imagen.onerror = reject;
+    });
+  }
+
+  private async clasificarRaza(imagen: HTMLImageElement): Promise<ResultadoClasificacion> {
+    try {
+      // Clasificación con MobileNet
+      const predicciones: Prediccion[] = await this.mobilenetModel!.classify(imagen);
+
+      // Filtrar predicciones relevantes para perros o gatos
+      const prediccionesRaza = predicciones
+        .filter(pred => {
+          const descLower = pred.className.toLowerCase();
+          return this.esRazaValida(descLower);
+        })
+        .sort((a, b) => b.probability - a.probability);
+
+      // Determinar tipo de animal
+      const tipoAnimal = this.determinarTipoAnimal(predicciones);
+
+      // Obtener la raza más confiable
+      const razaMasConfiable = prediccionesRaza.length > 0 
+        ? prediccionesRaza[0].className 
+        : 'No identificado';
+
+      const confianzaDeteccion = prediccionesRaza.length > 0 
+        ? (prediccionesRaza[0].probability * 100).toFixed(2)
+        : '0';
+
+      return {
+        tipoAnimal,
+        razaMasConfiable,
+        confianzaDeteccion
+      };
+    } catch (error) {
+      console.error('Error en clasificación:', error);
+      return { 
+        tipoAnimal: 'No identificado', 
+        razaMasConfiable: 'N/A', 
+        confianzaDeteccion: '0' 
+      };
+    }
+  }
+
+  private esRazaValida(descripcion: string): boolean {
+    return [...this.razasPerro, ...this.razasGato].some(raza => descripcion.includes(raza));
+  }
+
+  private determinarTipoAnimal(predicciones: Prediccion[]): string {
+    const palabrasPerro = ['dog', 'retriever', 'shepherd', 'terrier', 'poodle'];
+    const palabrasGato = ['cat', 'siamese', 'persian', 'maine coon'];
+
+    const esPerro = predicciones.some(pred => 
+      palabrasPerro.some(palabra => 
+        pred.className.toLowerCase().includes(palabra)
+      )
+    );
+
+    const esGato = predicciones.some(pred => 
+      palabrasGato.some(palabra => 
+        pred.className.toLowerCase().includes(palabra)
+      )
+    );
+
+    if (esPerro) return 'Perro';
+    if (esGato) return 'Gato';
+    return 'No identificado';
   }
 }

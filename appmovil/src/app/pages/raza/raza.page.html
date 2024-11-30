@@ -18,7 +18,7 @@
     <ion-row *ngIf="imagenBase64">
       <ion-col size="12">
         <ion-card>
-          <img [src]="imagenBase64" />
+          <img *ngIf="imagenBase64" [src]="imagenBase64" />
           <ion-card-header>
             <ion-card-title>Análisis de la Imagen</ion-card-title>
           </ion-card-header>
@@ -29,19 +29,14 @@
                 <ion-label>
                   <h2>Tipo de Animal</h2>
                   <p>{{ resultadosAnalisis.tipoAnimal }}</p>
-                  <p>Confianza: {{ resultadosAnalisis.confianzaDeteccion }}%</p>
                 </ion-label>
               </ion-item>
 
-              <ion-item-divider>
-                <ion-label>Razas Identificadas</ion-label>
-              </ion-item-divider>
-
-              <ion-item *ngFor="let raza of resultadosAnalisis.razasPosibles">
+              <ion-item>
                 <ion-label>
-                  <h2>{{ raza.nombre }}</h2>
-                  <p>{{ raza.tipo }}</p>
-                  <p>Confianza: {{ raza.confianza }}%</p>
+                  <h2>Raza Detectada</h2>
+                  <p>{{ resultadosAnalisis.razaMasConfiable }}</p>
+                  <p>Confianza: {{ resultadosAnalisis.confianzaDeteccion }}%</p>
                 </ion-label>
               </ion-item>
             </ion-list>

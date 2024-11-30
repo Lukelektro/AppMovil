@@ -1,16 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { StorageService } from '../../services/firebase-storage.service';
 import { VisionAIService } from '../../services/vision-ai-service.service';
 import { LoadingController, ToastController } from '@ionic/angular';
 
+// Updated interface to match the new service response
 interface ResultadoAnalisis {
   tipoAnimal: string;
-  razasPosibles: Array<{
-    tipo: string;
-    nombre: string;
-    confianza: string;
-  }>;
+  razaMasConfiable: string;
   confianzaDeteccion: string;
 }
 
@@ -21,11 +17,9 @@ interface ResultadoAnalisis {
 })
 export class RazaPage implements OnInit {
   public imagenBase64: string | undefined;
-  public urlImagen: string | undefined;
   public resultadosAnalisis: ResultadoAnalisis | undefined;
 
   constructor(
-    private storageService: StorageService,
     private visionService: VisionAIService,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController
@@ -44,7 +38,7 @@ export class RazaPage implements OnInit {
       
       if (image.base64String) {
         this.imagenBase64 = `data:image/jpeg;base64,${image.base64String}`;
-        await this.subirYAnalizarImagen(image.base64String);
+        await this.analizarImagen(image.base64String);
       }
     } catch (error) {
       console.error('Error al tomar la foto:', error);
@@ -52,45 +46,65 @@ export class RazaPage implements OnInit {
     }
   }
 
-  async subirYAnalizarImagen(base64: string) {
+  async analizarImagen(base64: string) {
     const loading = await this.loadingCtrl.create({
-      message: 'Analizando imagen...'
+      message: 'Preparando análisis...'
     });
     await loading.present();
-
+  
     try {
-      this.storageService.subirImagen(base64, 'Animales')
+      // Verificar si la imagen tiene el prefijo correcto
+      const base64Corregido = base64.startsWith('data:image') 
+        ? base64 
+        : `data:image/jpeg;base64,${base64}`;
+  
+      // Convertir base64 a File
+      const file = this.base64ToFile(base64Corregido, 'imagen.jpg');
+  
+      // Analizar imagen con TensorFlow.js
+      this.visionService.analizarImagen(file)
         .subscribe({
-          next: async (url: string) => {
-            this.urlImagen = url;
+          next: (resultados) => {
+            this.resultadosAnalisis = resultados;
             
-            // Analizar la imagen
-            this.visionService.analizarImagen(url)
-              .subscribe({
-                next: (resultados: ResultadoAnalisis) => {
-                  this.resultadosAnalisis = resultados;
-                  if (resultados.razasPosibles.length === 0) {
-                    this.mostrarMensaje('No se pudo identificar la raza con claridad');
-                  }
-                },
-                error: (error: Error) => {
-                  console.error('Error en el análisis:', error);
-                  this.mostrarMensaje('Error al analizar la imagen');
-                },
-                complete: () => {
-                  loading.dismiss();
-                }
-              });
-          },
-          error: (error: Error) => {
-            console.error('Error al subir la imagen:', error);
+            if (resultados.razaMasConfiable === 'No identificado') {
+              this.mostrarMensaje('No se pudo identificar la raza con claridad');
+            }
+            
             loading.dismiss();
-            this.mostrarMensaje('Error al subir la imagen');
+          },
+          error: (error) => {
+            console.error('Error en el análisis:', error);
+            this.mostrarMensaje('Error al analizar la imagen');
+            loading.dismiss();
           }
         });
+  
     } catch (error) {
+      console.error('Error general:', error);
+      this.mostrarMensaje('Error inesperado al procesar la imagen');
       loading.dismiss();
-      console.error('Error:', error);
+    }
+  }
+
+  // Método auxiliar para convertir base64 a File
+  private base64ToFile(base64: string, filename: string): File {
+    try {
+      // Eliminar prefijo de datos si existe
+      const base64Clean = base64.replace(/^data:image\/\w+;base64,/, '');
+      
+      const byteCharacters = atob(base64Clean);
+      const byteNumbers = new Array(byteCharacters.length);
+      
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      
+      const byteArray = new Uint8Array(byteNumbers);
+      return new File([byteArray], filename, { type: 'image/jpeg' });
+    } catch (error) {
+      console.error('Error en base64ToFile:', error);
+      throw new Error('No se pudo convertir la imagen');
     }
   }
 

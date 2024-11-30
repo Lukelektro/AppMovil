@@ -13,5 +13,5 @@ export const environment = {
     catApiUrl: 'https://api.thecatapi.com/v1/images/search', 
     dogApiUrl: 'https://api.thedogapi.com/v1/images/search'
   },
-    googleCloudApiKey: 'AIzaSyBp3ifaKJ2Ow2VNqeWBVvZmqL6eDorhpzk' 
+  googleCloudApiKey: 'AIzaSyBp3ifaKJ2Ow2VNqeWBVvZmqL6eDorhpzk' 
 };
