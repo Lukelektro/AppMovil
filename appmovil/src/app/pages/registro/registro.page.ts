@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { NavController, AlertController } from '@ionic/angular';
 import { Usuario } from 'src/app/models/usuario.model';
 import { FirestoreService } from 'src/app/services/firestore.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 
-// Definimos un tipo para los campos del formulario
 type CamposFormulario = 'nombre' | 'email' | 'password' | 'telefono' | 'direccion';
 
 @Component({
@@ -12,11 +13,9 @@ type CamposFormulario = 'nombre' | 'email' | 'password' | 'telefono' | 'direccio
   templateUrl: './registro.page.html',
   styleUrls: ['./registro.page.scss'],
 })
-
 export class RegistroPage implements OnInit {
-
   newUsuario: Usuario = {
-    id: this.firestoreService.createIdDoc(),  // Genera un nuevo ID
+    id: '',
     nombre: '',
     email: '',
     password: '',
@@ -32,15 +31,28 @@ export class RegistroPage implements OnInit {
     direccion: ''
   };
 
+  esEdicion: boolean = false; 
+
   constructor(
     private navController: NavController, 
     private alertController: AlertController,
     private firestoreService: FirestoreService,
-    private auth: Auth
+    private auth: Auth,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
-    console.log('Firebase Auth inicializado:', this.auth);
+    // Recuperar los parámetros de navegación
+    this.route.queryParams.subscribe(params => {
+      this.newUsuario.id = params['id'] || this.firestoreService.createIdDoc();
+      this.newUsuario.nombre = params['nombre'] || '';
+      this.newUsuario.email = params['email'] || '';
+      this.newUsuario.telefono = params['telefono'] || '';
+      this.newUsuario.direccion = params['direccion'] || '';
+      this.newUsuario.password = params['password'] || '';
+
+      this.esEdicion = !!params['id'];
+    });
   }
 
   crearUsuario(evento: CustomEvent, campo: CamposFormulario) {
@@ -52,19 +64,19 @@ export class RegistroPage implements OnInit {
   validarCampo(campo: CamposFormulario, valor: string) {
     switch (campo) {
       case 'nombre':
-        this.errores.nombre = this.validarNombre(valor);
+        this.errores['nombre'] = this.validarNombre(valor);
         break;
       case 'email':
-        this.errores.email = this.validarEmail(valor);
+        this.errores['email'] = this.validarEmail(valor);
         break;
       case 'password':
-        this.errores.password = this.validarPassword(valor);
+        this.errores['password'] = this.validarPassword(valor);
         break;
       case 'telefono':
-        this.errores.telefono = this.validarTelefono(valor);
+        this.errores['telefono'] = this.validarTelefono(valor);
         break;
       case 'direccion':
-        this.errores.direccion = this.validarDireccion(valor);
+        this.errores['direccion'] = this.validarDireccion(valor);
         break;
     }
   }
@@ -92,7 +104,7 @@ export class RegistroPage implements OnInit {
   }
 
   formularioValido(): boolean {
-    const camposLlenos = Object.values(this.newUsuario).every(valor => valor !== '' && valor !== null); // Asegúrate de que no haya valores nulos
+    const camposLlenos = Object.values(this.newUsuario).every(valor => valor !== '' && valor !== null);
     const sinErrores = Object.values(this.errores).every(error => error === '');
     return camposLlenos && sinErrores;
   }
@@ -105,8 +117,13 @@ export class RegistroPage implements OnInit {
         // Guardar en Firestore
         await this.firestoreService.createDocumentID(this.newUsuario, 'Usuarios', this.newUsuario.id);
 
-        await this.presentAlert();
-        console.log('Usuario creado exitosamente');
+        if(this.esEdicion) {
+          await this.presentAlert();
+          console.log('Usuario guardado exitosamente');
+        } else {
+          await this.presentAlert();
+          console.log('Usuario creado exitosamente');
+        }
         
       } catch (error: any) {
         console.error('Error al crear usuario:', error);

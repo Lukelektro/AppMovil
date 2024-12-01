@@ -19,6 +19,23 @@ export class ServicioAlmacenamiento {
     this.inicializar(); // Se inicializa el almacenamiento
   }
 
+  async getEmail(): Promise<string | null> {
+    try {
+      return await this.storage.get('email') || null;
+    } catch (error) {
+      console.error('Error reading email from storage:', error);
+      return null;
+    }
+  }
+
+  async setEmail(email: string): Promise<void> {
+    try {
+      await this.storage.set('email', email);
+    } catch (error) {
+      console.error('Error saving email to storage:', error);
+    }
+  }
+
   // Inicializa Ionic Storage para el entorno web
   private async inicializarIonicStorage() {
     try {

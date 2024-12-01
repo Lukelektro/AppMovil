@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { collectionData, Firestore, doc, getDoc, getDocs, deleteDoc, setDoc, query, where } from '@angular/fire/firestore';
+import { collectionData, Firestore, doc, getDoc, getDocs, deleteDoc, setDoc, query, where, updateDoc } from '@angular/fire/firestore';
 import { Storage, ref, getDownloadURL } from '@angular/fire/storage';
 import { collection } from 'firebase/firestore';
 import { Observable } from 'rxjs';
@@ -79,6 +79,12 @@ export class FirestoreService {
       console.error(`Error al actualizar el documento con ID ${idDoc} en la ruta: ${enlace}`, error);
       throw new Error(`No se pudo actualizar el documento con ID ${idDoc} en la ruta: ${enlace}`);
     }
+  }
+
+  //metodo para actualizar mediante email
+  async updateDocument(collectionName: string, docId: string, data: any): Promise<void> {
+    const docRef = doc(this.firestore, collectionName, docId);
+    await updateDoc(docRef, data);
   }
 
   // Método para obtener un documento por el campo email

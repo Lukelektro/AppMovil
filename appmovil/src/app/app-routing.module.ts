@@ -43,7 +43,11 @@ const routes: Routes = [
   {
     path: 'raza',
     loadChildren: () => import('./pages/raza/raza.module').then( m => m.RazaPageModule)
+  },  {
+    path: 'verify-code',
+    loadChildren: () => import('./pages/verify-code/verify-code.module').then( m => m.VerifyCodePageModule)
   },
+
 
 
 ];

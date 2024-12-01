@@ -1,0 +1,51 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="centered-container">
+    <form (ngSubmit)="onVerifyCode()" class="centered-form">
+      <h2 class="ion-text-center">Verificación de Código</h2>
+      
+      <ion-item>
+        <ion-label position="floating">Código de Verificación</ion-label>
+        <ion-input 
+          type="text" 
+          [(ngModel)]="code" 
+          name="code" 
+          maxlength="6"
+          (ionBlur)="validateCode()"
+        ></ion-input>
+      </ion-item>
+      
+      <div *ngIf="codeError" class="ion-padding-start">
+        <ion-text color="danger">{{ codeError }}</ion-text>
+      </div>
+      
+      <p class="ion-text-center ion-padding">
+        Se ha enviado un código de 6 dígitos al correo 
+        <strong>{{ email }}</strong>
+      </p>
+      
+      <ion-button 
+        expand="block" 
+        type="submit" 
+        [disabled]="!code || code.length !== 6"
+      >
+        Verificar Código
+      </ion-button>
+      
+      <div class="ion-text-center ion-padding-top">
+        <ion-button fill="clear" color="medium" (click)="resendCode()">
+          Reenviar Código
+        </ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>
