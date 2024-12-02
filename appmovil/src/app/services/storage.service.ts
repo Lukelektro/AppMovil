@@ -201,8 +201,20 @@ export class ServicioAlmacenamiento {
           return null;
         }
       } else {
-        // Firebase: Obtener documento usando FirestoreService
-        return await this.firestoreService.getDocumentById(entidad, key);
+         // Firebase: Si es la colección Usuarios, usar getDocumentByEmail
+        if (entidad === 'Usuarios' && (key === 'email' || key === 'password' || key === 'rememberMe')) {
+          // Obtener el email almacenado localmente para buscar el documento
+          const emailAlmacenado = await this.storage.get('email');
+          if (emailAlmacenado) {
+            const document = await this.firestoreService.getDocumentByEmail(entidad, emailAlmacenado);
+            return document ? document[key] : null;
+          }
+          return null;
+        } else {
+          // Para otras colecciones usar getDocumentById
+          const document = await this.firestoreService.getDocumentById(entidad, key);
+          return document;
+        }
       }
     } catch (error) {
       console.error(`Error al obtener el valor para la clave: ${key}`, error);

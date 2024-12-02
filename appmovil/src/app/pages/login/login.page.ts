@@ -57,6 +57,7 @@ export class LoginPage {
       }
     } catch (error) {
       console.error('Error durante la carga de credenciales almacenadas:', error);
+      this.mostrarMensajeError('No se pudo cargar las credenciales almacenadas.');
     }
   }
 

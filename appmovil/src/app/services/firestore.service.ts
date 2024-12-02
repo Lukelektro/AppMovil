@@ -65,7 +65,7 @@ export class FirestoreService {
       }
     } catch (error) {
       console.error(`Error al obtener documento con ID ${idDoc} de Firestore`, error);
-      throw error;
+      throw new Error(`Error al obtener documento con ID ${idDoc} de Firestore: ${(error as Error).message}`);
     }
   }
 
