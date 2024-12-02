@@ -59,6 +59,8 @@ export class EmailService {
   
       const result = await response.json();
   
+      console.log('Respuesta del servidor:', result);
+      
       if (result.success) {
         return {
           success: true,

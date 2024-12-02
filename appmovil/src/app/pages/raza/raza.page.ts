@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { VisionAIService } from '../../services/vision-ai-service.service';
 import { LoadingController, ToastController } from '@ionic/angular';
+import { ActionSheetController } from '@ionic/angular';
 
 // Updated interface to match the new service response
 interface ResultadoAnalisis {
@@ -22,18 +23,50 @@ export class RazaPage implements OnInit {
   constructor(
     private visionService: VisionAIService,
     private loadingCtrl: LoadingController,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private actionSheetCtrl: ActionSheetController
   ) {}
 
   ngOnInit() {}
 
   async capturarImagen() {
     try {
+      // Mostrar un actionsheet para elegir entre cámara y galería
+      const actionSheet = await this.actionSheetCtrl.create({
+        header: 'Seleccionar imagen',
+        buttons: [
+          {
+            text: 'Tomar foto',
+            icon: 'camera',
+            handler: () => this.tomarFoto(CameraSource.Camera)
+          },
+          {
+            text: 'Elegir de galería',
+            icon: 'image',
+            handler: () => this.tomarFoto(CameraSource.Photos)
+          },
+          {
+            text: 'Cancelar',
+            icon: 'close',
+            role: 'cancel'
+          }
+        ]
+      });
+      await actionSheet.present();
+    } catch (error) {
+      console.error('Error al seleccionar imagen:', error);
+      this.mostrarMensaje('Error al seleccionar imagen');
+    }
+  }
+  
+  async tomarFoto(source: CameraSource) {
+    try {
       const image = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
         resultType: CameraResultType.Base64,
-        source: CameraSource.Camera
+        source: source,
+        saveToGallery: source === CameraSource.Camera // Solo guardar si es de cámara
       });
       
       if (image.base64String) {
@@ -41,7 +74,7 @@ export class RazaPage implements OnInit {
         await this.analizarImagen(image.base64String);
       }
     } catch (error) {
-      console.error('Error al tomar la foto:', error);
+      console.error('Error al capturar/seleccionar imagen:', error);
       this.mostrarMensaje('Error al capturar la imagen');
     }
   }
