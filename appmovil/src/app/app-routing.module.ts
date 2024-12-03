@@ -43,12 +43,24 @@ const routes: Routes = [
   {
     path: 'raza',
     loadChildren: () => import('./pages/raza/raza.module').then( m => m.RazaPageModule)
-  },  {
+  },
+  {
     path: 'verify-code',
     loadChildren: () => import('./pages/verify-code/verify-code.module').then( m => m.VerifyCodePageModule)
   },
-
-
+  // Ruta para página 404
+  {
+    path: 'not-found',
+    loadChildren: () => import('./pages/not-found/not-found.module').then(m => m.NotFoundPageModule)
+  },
+  // Ruta wildcard que redirige a login
+  {
+    path: '**',
+    redirectTo: 'login'
+  },  {
+    path: 'not-found',
+    loadChildren: () => import('./pages/not-found/not-found.module').then( m => m.NotFoundPageModule)
+  }
 
 ];
 
