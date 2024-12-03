@@ -149,4 +149,9 @@ export class RazaPage implements OnInit {
     });
     toast.present();
   }
+
+  reiniciarAnalisis() {
+    this.imagenBase64 = null;
+    // Aquí puedes agregar cualquier otra lógica necesaria para reiniciar el análisis
+  }
 }

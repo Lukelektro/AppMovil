@@ -14,8 +14,15 @@
         </ion-button>
       </ion-col>
     </ion-row>
-
     <ion-row *ngIf="imagenBase64">
+      <ion-col size="12" class="ion-text-center">
+        <ion-button color="danger" (click)="reiniciarAnalisis()">
+          <ion-icon slot="start" name="refresh"></ion-icon>
+          Reiniciar Análisis
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="imagenBase64" class="ion-justify-content-center">
       <ion-col size="12">
         <ion-card>
           <img *ngIf="imagenBase64" [src]="imagenBase64" />
@@ -23,7 +30,7 @@
             <ion-card-title>Análisis de la Imagen</ion-card-title>
           </ion-card-header>
           
-          <ion-card-content *ngIf="resultadosAnalisis">
+          <ion-card-content *ngIf="resultadosAnalisis" class="ion-justify-content-center">
             <ion-list>
               <ion-item>
                 <ion-label>
@@ -32,7 +39,7 @@
                 </ion-label>
               </ion-item>
 
-              <ion-item>
+              <ion-item class="ion-justify-content-center">
                 <ion-label>
                   <h2>Raza Detectada</h2>
                   <p>{{ resultadosAnalisis.razaMasConfiable }}</p>
@@ -44,6 +51,7 @@
         </ion-card>
       </ion-col>
     </ion-row>
+    
   </ion-grid>
 </ion-content>
 
